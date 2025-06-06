@@ -20,11 +20,11 @@ enum BLOG_TYPE {
     styleUrls: ['./blog.component.scss'],
     standalone: true,
     imports: [
-    CommonModule,
-    SearchComponent,
-    CategoriesComponent,
-    LoaderComponent
-]
+        CommonModule,
+        SearchComponent,
+        CategoriesComponent,
+        LoaderComponent
+    ]
 })
 export class BlogComponent implements OnInit {
   public posts: any[] = [];
@@ -184,11 +184,12 @@ export class BlogComponent implements OnInit {
     ]
   };
 
-  constructor(private route: ActivatedRoute,
-              private router: Router,
-              private meta: Meta,
-              public mTitle: Title) {
-  }
+  constructor(
+      private route: ActivatedRoute,
+      private router: Router,
+      private meta: Meta,
+      public mTitle: Title)
+  {}
 
   ngOnInit(): void {
       // Cargar categorías desde datos locales
@@ -203,6 +204,7 @@ export class BlogComponent implements OnInit {
   }
 
   navigationChange(type: string | undefined, slug: string | undefined, searchParam: string | undefined) {
+      debugger;
       if (searchParam) {
           this.router.navigate(['blog', 'search'], {queryParams: {q: searchParam}});
       } else if (!slug) {
@@ -214,102 +216,101 @@ export class BlogComponent implements OnInit {
   }
 
   getPosts(typeParam: string | undefined, slugParam: string | undefined, searchParam: string | undefined) {
-    this.pageLoading = true;
-    this.title = 'All posts';
-    this.post = null;
+      this.pageLoading = true;
+      this.title = 'All posts';
+      this.post = null;
 
-    if (searchParam) {
-      this.blogType = BLOG_TYPE.SEARCH;
-      this.brTitle = searchParam;
-      this.title = 'search results for query: ' + searchParam;
+      if (searchParam) {
+          this.blogType = BLOG_TYPE.SEARCH;
+          this.brTitle = searchParam;
+          this.title = 'search results for query: ' + searchParam;
 
-      // Filtrar posts por término de búsqueda
-      const searchTerm = searchParam.toLowerCase();
-      this.posts = this.postsData.data.filter(post =>
-        post.title.toLowerCase().includes(searchTerm) ||
-        post.summary.toLowerCase().includes(searchTerm) ||
-        post.body.toLowerCase().includes(searchTerm)
-      );
+          // Filtrar posts por término de búsqueda
+          const searchTerm = searchParam.toLowerCase();
+          this.posts = this.postsData.data.filter(post =>
+              post.title.toLowerCase().includes(searchTerm) ||
+              post.summary.toLowerCase().includes(searchTerm) ||
+              post.body.toLowerCase().includes(searchTerm)
+          );
 
-      this.pageLoading = false;
-      this.setSeo();
-    } else if (typeParam && !slugParam) {
-      // Buscar post individual por slug
-      const foundPost = this.postsData.data.find(post => post.slug === typeParam);
-      if (foundPost) {
-        this.blogType = BLOG_TYPE.POST;
-        this.post = foundPost;
-        this.pageLoading = false;
-        this.mTitle.setTitle(this.post.seo_title);
-        this.meta.removeTag("name='description'");
-        this.meta.addTag({name: 'description', content: this.post.meta_description});
-        this.meta.removeTag("name='image'");
-        if (this.post.featured_image) {
-          this.meta.addTag({name: 'image', content: this.post.featured_image});
-        }
-      } else {
-        this.navigateToNotFound();
-      }
-    } else {
-      let filterBy: {category_slug?: string, tag_slug?: string} = {};
-
-      if (typeParam && slugParam) {
-        if (typeParam === BLOG_TYPE.CATEGORY) {
-          this.blogType = BLOG_TYPE.CATEGORY;
-          const category = this.categories.find(cat => cat.slug === slugParam);
-          if (category) {
-            this.title = 'category: ' + category.name;
-            this.brTitle = category.name;
-            filterBy = {category_slug: slugParam};
-          }
-        } else if (typeParam === BLOG_TYPE.TAG) {
-          this.blogType = BLOG_TYPE.TAG;
-          // Encontrar el tag en cualquier post
-          let tagName = '';
-          for (const post of this.postsData.data) {
-            const tag = post.tags.find((t: any) => t.slug === slugParam);
-            if (tag) {
-              tagName = tag.name;
-              break;
+          this.pageLoading = false;
+          this.setSeo();
+      } else if (typeParam && !slugParam) {
+          const foundPost = this.postsData.data.find(post => post.slug === typeParam);
+          if (foundPost) {
+            this.blogType = BLOG_TYPE.POST;
+            this.post = foundPost;
+            this.pageLoading = false;
+            this.mTitle.setTitle(this.post.seo_title);
+            this.meta.removeTag("name='description'");
+            this.meta.addTag({name: 'description', content: this.post.meta_description});
+            this.meta.removeTag("name='image'");
+            if (this.post.featured_image) {
+              this.meta.addTag({name: 'image', content: this.post.featured_image});
             }
+          } else {
+            this.navigateToNotFound();
           }
-          this.title = 'tag: ' + tagName;
-          this.brTitle = tagName;
-          filterBy = {tag_slug: slugParam};
-        } else {
-          this.navigateToNotFound();
-          return;
-        }
-      }
-
-      // Filtrar posts según los parámetros
-      if (filterBy.category_slug) {
-        this.posts = this.postsData.data.filter(post =>
-          post.categories.some((cat: any) => cat.slug === filterBy.category_slug)
-        );
-      } else if (filterBy.tag_slug) {
-        this.posts = this.postsData.data.filter(post =>
-          post.tags.some((tag: any) => tag.slug === filterBy.tag_slug)
-        );
       } else {
-        // Todos los posts
-        this.posts = [...this.postsData.data];
-      }
+        let filterBy: {category_slug?: string, tag_slug?: string} = {};
 
-      this.pageLoading = false;
-      this.setSeo();
-    }
+        if (typeParam && slugParam) {
+            if (typeParam === BLOG_TYPE.CATEGORY) {
+                this.blogType = BLOG_TYPE.CATEGORY;
+                const category = this.categories.find(cat => cat.slug === slugParam);
+                if (category) {
+                  this.title = 'category: ' + category.name;
+                  this.brTitle = category.name;
+                  filterBy = {category_slug: slugParam};
+                }
+            } else if (typeParam === BLOG_TYPE.TAG) {
+                this.blogType = BLOG_TYPE.TAG;
+                // Encontrar el tag en cualquier post
+                let tagName = '';
+                for (const post of this.postsData.data) {
+                  const tag = post.tags.find((t: any) => t.slug === slugParam);
+                  if (tag) {
+                    tagName = tag.name;
+                    break;
+                  }
+                }
+                this.title = 'tag: ' + tagName;
+                this.brTitle = tagName;
+                filterBy = {tag_slug: slugParam};
+            } else {
+                this.navigateToNotFound();
+                return;
+            }
+        }
+
+        // Filtrar posts según los parámetros
+        if (filterBy.category_slug) {
+            this.posts = this.postsData.data.filter(post =>
+              post.categories.some((cat: any) => cat.slug === filterBy.category_slug)
+            );
+        } else if (filterBy.tag_slug) {
+            this.posts = this.postsData.data.filter(post =>
+              post.tags.some((tag: any) => tag.slug === filterBy.tag_slug)
+            );
+        } else {
+            // Todos los posts
+            this.posts = [...this.postsData.data];
+        }
+
+          this.pageLoading = false;
+          this.setSeo();
+      }
   }
 
   setSeo() {
-    this.mTitle.setTitle('Sample Blog - ' + this.title);
-    this.meta.removeTag("name='description'");
-    this.meta.removeTag("name='image'");
-    this.meta.addTag({name: 'description', content: 'Sample blog powered by ButterCMS, showing ' + this.title});
+      this.mTitle.setTitle('Sample Blog - ' + this.title);
+      this.meta.removeTag("name='description'");
+      this.meta.removeTag("name='image'");
+      this.meta.addTag({name: 'description', content: 'Sample blog powered by ButterCMS, showing ' + this.title});
   }
 
   private navigateToNotFound() {
-    this.router.navigate(['/not-found']);
+      this.router.navigate(['/not-found']);
   }
 
 }

@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
-import {Component, Input, OnInit} from '@angular/core';
-import {Router} from '@angular/router';
+import { Component, Input } from '@angular/core';
+import { Router } from '@angular/router';
 
 @Component({
     selector: 'app-blog-section',
@@ -15,11 +15,13 @@ export class BlogSectionComponent {
 
   @Input() posts: any;
 
-  constructor(private router: Router) {
-  }
+  constructor(
+      private router: Router
+  ) {}
 
   onClick(slug: string) {
-    this.router.navigate(['blog', slug]);
+      debugger;
+      this.router.navigate(['blog', slug]);
   }
 
 }

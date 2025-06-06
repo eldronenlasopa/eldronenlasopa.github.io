@@ -1,9 +1,15 @@
 import { Route } from '@angular/router';
+import { LayoutComponent } from './layout/layout.component';
 
 export const routes: Route[] = [
     {
         path: '',
-        loadChildren: () => import('./layout/layout.routing').then(m => m.default)
+        component: LayoutComponent,
+        children: [
+            {path: '', loadChildren: () => import('./pages/pages.routes')}
+        ]
     },
-    { path: '**', redirectTo: '' } // Redirige rutas no encontradas
+    /*{
+        path: '**', redirectTo: ''
+    }*/
 ];
