@@ -2,3 +2,72 @@
 @import '../public/assets/css/lineicons.css';
 @import '../public/assets/css/tiny-slider.css';
 @import '../public/assets/css/main.css';
+
+
+
+/* Elimina todos los espacios innecesarios y ajusta precisamente */
+.mat-mdc-form-field {
+  /* Ajuste general para todo el campo */
+  --error-spacing: 0px; /* Espacio mínimo entre input y error */
+
+  .mat-mdc-text-field-wrapper {
+    padding: 0 !important;
+
+    .mat-mdc-form-field-flex {
+      padding: 0 !important;
+      min-height: auto !important;
+    }
+
+    .mdc-line-ripple {
+        display: none;
+    }
+
+  }
+
+  /* Contenedor del error - ajuste fino */
+  .mat-mdc-form-field-subscript-wrapper {
+    height: auto !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+    margin-top: var(--error-spacing) !important;
+
+    .mat-mdc-form-field-error-wrapper {
+      padding: 0 !important;
+      position: static !important;
+
+      .mat-mdc-form-field-error {
+        color: #f44336 !important;
+        font-size: 12px !important;
+        line-height: 1.2 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        display: block;
+      }
+    }
+  }
+}
+
+/* Ajuste específico para el infix (área del input) */
+.mat-mdc-form-field-infix {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  min-height: auto !important;
+}
+
+/* Si usas appearance="outline" */
+.mat-mdc-form-field.mat-form-field-appearance-outline {
+  --error-spacing: 2px; /* Aún menos espacio para outline */
+
+  .mat-mdc-form-field-infix {
+    padding: 8px 0 !important; /* Ajuste fino para outline */
+  }
+}
+
+/* Si usas appearance="fill" */
+.mat-mdc-form-field.mat-form-field-appearance-fill {
+  --error-spacing: 1px; /* Mínimo espacio para fill */
+
+  .mat-mdc-form-field-infix {
+    padding: 4px 0 !important; /* Ajuste fino para fill */
+  }
+}

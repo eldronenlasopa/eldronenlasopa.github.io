@@ -192,7 +192,8 @@ export class BlogComponent implements OnInit {
   {}
 
   ngOnInit(): void {
-      // Cargar categorías desde datos locales
+    debugger;
+    // Cargar categorías desde datos locales
       this.categories = this.categoriesData.data;
 
       // Obtener posts según los parámetros de la ruta

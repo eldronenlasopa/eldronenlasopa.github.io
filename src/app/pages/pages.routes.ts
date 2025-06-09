@@ -12,7 +12,7 @@ export default [
         component: BlogComponent
     },
     {
-        path: 'blog/:slug',
+        path: 'blog/:type',
         component: BlogComponent
     },
 
