@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import {Component, Input, OnInit} from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { ScrollTopComponent } from "../scroll-top/scroll-top.component";
 import { MatInputModule } from '@angular/material/input';
 import { FormsModule, ReactiveFormsModule, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
@@ -37,21 +37,24 @@ export class FooterComponent implements OnInit {
     }
 
     notificar() : void{
-        debugger;
         if (this.suscripcionForm.valid) {
-            this.mensajesService.msgConfirm("¿Está seguro de enviar por correo electrónico el link para que el usuario seleccionado genere su contraseña?", () => {
+            this.mensajesService.msgConfirm("¿Está seguro de enviar su correo para suscripción al boletín informativo?", () => {
                 this.mensajesService.msgLoad("Procesando...");
 
-                this.mensajesService.msgSuccessMixin('Se envió el link para generar contraseña a la dirección de correo electrónico del usuario seleccionado.', "");
+                this.mensajesService.msgSuccessMixin("Se ha enviado su solicitud de suscripción.", "");
+
+                this.suscripcionForm.reset();
+                this.Email.setErrors(null);
+
             },null);
         }
     }
 
     get Email(): any { return this.suscripcionForm.get('email'); }
     get menuItems() {
-      if (this.menuData) {
-          return this.menuData.data.navigation_menu[0].menu_items;
-      }
-      return [];
-  }
+        if (this.menuData) {
+            return this.menuData.data.navigation_menu[0].menu_items;
+        }
+        return [];
+    }
 }

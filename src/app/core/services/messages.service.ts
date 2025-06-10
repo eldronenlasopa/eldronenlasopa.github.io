@@ -117,10 +117,10 @@ export class MensajesService {
             cancelButtonColor: '#b5b3b3',
             cancelButtonText: 'NO',
             confirmButtonText: 'SI',
-            confirmButtonColor: '#2563eb',
+            confirmButtonColor: '#92654f',
             reverseButtons: true,
             didOpen: () => {
-                    Swal.hideLoading();
+                Swal.hideLoading();
             }
         }).then((resultado) => {
             if (resultado) {

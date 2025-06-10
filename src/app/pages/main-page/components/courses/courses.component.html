@@ -1,0 +1,35 @@
+<section id="blog" class="blog-section">
+    <div class="container">
+        <div class="row justify-start">
+            <div class="col-lg-6 col-md-10">
+                <h2>Cursos</h2>
+            </div>
+        </div>
+        <div class="row justify-start">
+            <ng-container *ngFor="let post of courses.data">
+                <div class="col-lg-4 col-md-8 col-sm-10">
+                    <div class="single-blog">
+                        <div class="blog-header" *ngIf="post.featured_image">
+                            <img
+                                class="img-fluid"
+                                loading="lazy"
+                                [src]="post.featured_image"
+                                [alt]="post.featured_image_alt"
+                            >
+                        </div>
+                        <div class="blog-body">
+                            <h5 class="package-name"><a href="#">{{ post.title }}</a></h5>
+                            <div class="fs-6 pt-3">
+                              <mat-icon fontIcon="home"></mat-icon>
+                                Inicio: {{ post.startdate | date:'dd/MM/yyyy' }}
+                            </div>
+                        </div>
+                        <div class="blog-footer">
+                            <a (click)="onClick(post.slug)" class="main-btn btn-hover">Ver curso</a>
+                        </div>
+                    </div>
+                </div>
+            </ng-container>
+        </div>
+    </div>
+</section>

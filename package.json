@@ -23,6 +23,7 @@
     "angular-cli-ghpages": "^2.0.3",
     "eldronenlasopa": "file:",
     "g": "^2.0.1",
+    "ng-heroicons": "^12.0.0",
     "rxjs": "~7.8.0",
     "sweetalert2": "^11.22.0",
     "tslib": "^2.3.0",

@@ -13,15 +13,14 @@ import { Router } from '@angular/router';
 })
 export class BlogSectionComponent {
 
-  @Input() posts: any;
+    @Input() posts: any;
 
-  constructor(
-      private router: Router
-  ) {}
+    constructor(
+        private router: Router
+    ) {}
 
-  onClick(slug: string) {
-      debugger;
-      this.router.navigate(['blog', slug]);
-  }
+    onClick(slug: string) {
+        this.router.navigate(['blog', slug]);
+    }
 
 }
