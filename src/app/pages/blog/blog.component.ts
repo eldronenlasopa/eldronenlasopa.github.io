@@ -192,8 +192,7 @@ export class BlogComponent implements OnInit {
   {}
 
   ngOnInit(): void {
-    debugger;
-    // Cargar categorías desde datos locales
+      // Cargar categorías desde datos locales
       this.categories = this.categoriesData.data;
 
       // Obtener posts según los parámetros de la ruta
@@ -205,7 +204,6 @@ export class BlogComponent implements OnInit {
   }
 
   navigationChange(type: string | undefined, slug: string | undefined, searchParam: string | undefined) {
-      debugger;
       if (searchParam) {
           this.router.navigate(['blog', 'search'], {queryParams: {q: searchParam}});
       } else if (!slug) {

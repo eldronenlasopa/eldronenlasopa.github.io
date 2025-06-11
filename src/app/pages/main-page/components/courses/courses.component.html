@@ -19,10 +19,28 @@
                         </div>
                         <div class="blog-body">
                             <h5 class="package-name"><a href="#">{{ post.title }}</a></h5>
-                            <div class="fs-6 pt-3">
-                              <mat-icon fontIcon="home"></mat-icon>
-                                Inicio: {{ post.startdate | date:'dd/MM/yyyy' }}
-                            </div>
+                            <table class="table align-middle w-100 mt-3">
+                                <tbody>
+                                  <tr class="py-3">
+                                    <td style="width:35%">
+                                      <div class="d-flex align-items-center">
+                                        <mat-icon class="me-2" fontIcon="co_present"></mat-icon>
+                                        <span>Docente :</span>
+                                      </div>
+                                    </td>
+                                    <td style="width:65%">{{ post.author.last_name + ', ' + post.author.first_name }}</td>
+                                  </tr>
+                                  <tr class="py-3">
+                                    <td style="width:35%">
+                                      <div class="d-flex align-items-center">
+                                        <mat-icon class="me-2" fontIcon="calendar_month"></mat-icon>
+                                        <span>Inicio :</span>
+                                      </div>
+                                    </td>
+                                    <td style="width:65%">{{ post.startdate | date:'dd/MM/yyyy' }} </td>
+                                  </tr>
+                                </tbody>
+                            </table>
                         </div>
                         <div class="blog-footer">
                             <a (click)="onClick(post.slug)" class="main-btn btn-hover">Ver curso</a>

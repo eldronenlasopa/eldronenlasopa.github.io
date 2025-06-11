@@ -1,6 +1,7 @@
 import { CommonModule } from "@angular/common";
-import { Component, Input, OnInit } from "@angular/core";
+import { ChangeDetectionStrategy, Component, Input } from "@angular/core";
 import { MatIconModule } from '@angular/material/icon';
+import { Router } from "@angular/router";
 
 @Component({
     selector: 'app-courses-section',
@@ -10,13 +11,19 @@ import { MatIconModule } from '@angular/material/icon';
     imports: [
         CommonModule,
         MatIconModule
-    ]
+    ],
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 
-export class CoursesComponent {
+export class CoursesSectionComponent {
     @Input () courses: any;
 
+    constructor(
+      private router: Router
+  ) {}
+
     onClick(slug: string) {
+        this.router.navigate(['courses', slug]);
     }
 
 }
