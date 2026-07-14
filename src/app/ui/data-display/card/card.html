@@ -1,0 +1,6 @@
+<div [class]="classes()" [style.padding]="padding()">
+  @if (accent()) {
+    <span class="absolute top-0 left-0 right-0 h-1 bg-accent-primary"></span>
+  }
+  <ng-content />
+</div>

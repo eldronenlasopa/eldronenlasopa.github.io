@@ -1,0 +1,5 @@
+<button [type]="type()" [disabled]="disabled()" [class]="classes()" (click)="onClick($event)">
+  <ng-content select="[slot=icon-left]" />
+  <ng-content />
+  <ng-content select="[slot=icon-right]" />
+</button>

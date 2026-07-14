@@ -1,0 +1,27 @@
+<footer class="bg-surface-inverse px-8 pt-16 pb-7 text-text-on-inverse">
+  <div class="mx-auto grid max-w-[1200px] grid-cols-1 gap-10 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
+    <div>
+      <app-wordmark tone="light" />
+      <p class="mt-4 max-w-[260px] font-body text-sm leading-[1.6] text-text-inverse-muted">
+        <strong class="font-semibold text-text-on-inverse">El Dron en la Sopa</strong> — la tecnología está en todo,
+        hasta en la sopa. Aplicaciones, páginas y automatizaciones a medida.
+      </p>
+    </div>
+    @for (col of columns; track col.title) {
+      <div>
+        <h4 class="m-0 mb-3 font-mono text-xs uppercase tracking-[0.14em] text-brand-yellow">{{ col.title }}</h4>
+        @for (item of col.items; track item) {
+          <a href="#" class="block py-1.5 font-body text-sm text-text-inverse-muted no-underline hover:text-white">{{
+            item
+          }}</a>
+        }
+      </div>
+    }
+  </div>
+  <div
+    class="mx-auto mt-10 flex max-w-[1200px] flex-wrap justify-between gap-3 border-t border-border-inverse pt-6 font-mono text-xs text-text-faint"
+  >
+    <span>© 2026 El Dron en la Sopa</span>
+    <span>Hecho con café en Perú ☕</span>
+  </div>
+</footer>

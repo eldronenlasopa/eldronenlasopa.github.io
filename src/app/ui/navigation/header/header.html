@@ -1,0 +1,9 @@
+<header [class]="headerClasses()">
+  <app-wordmark [tone]="inverse() ? 'light' : 'dark'" />
+  <nav class="flex items-center gap-7">
+    @for (link of links(); track link.label) {
+      <a [href]="link.href" [class]="linkClasses()">{{ link.label }}</a>
+    }
+  </nav>
+  <app-button variant="primary" size="sm" (clicked)="ctaClicked.emit()">{{ cta() }}</app-button>
+</header>

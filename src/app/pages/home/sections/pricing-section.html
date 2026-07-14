@@ -1,0 +1,36 @@
+<section id="planes" class="border-t border-border-subtle bg-surface-card px-8 py-24">
+  <div class="mx-auto max-w-[1200px] text-center">
+    <div class="mb-3.5 font-mono text-[13px] uppercase tracking-[0.14em] text-brand-orange-600">// Planes</div>
+    <h2 class="m-0 mb-3 font-display text-4xl font-bold tracking-[-0.03em] text-text-strong">
+      Precios claros, sin sorpresas
+    </h2>
+    <p class="mx-auto mb-[52px] max-w-[520px] text-lg text-text-muted">
+      Empieza con lo justo y crece a tu ritmo. Cada plan incluye acompañamiento cercano.
+    </p>
+    <div class="flex flex-wrap items-stretch justify-center gap-6">
+      <app-pricing-card
+        name="Emprende"
+        price="S/ 1,200"
+        description="Para lanzar tu presencia digital."
+        [features]="['Landing page a medida', 'Formulario de contacto', 'Hosting 1 año incluido', '2 rondas de ajustes']"
+        cta="Empezar"
+      />
+      <app-pricing-card
+        name="Crece"
+        price="S/ 3,500"
+        [featured]="true"
+        description="Aplicación web completa a medida."
+        [features]="['App web a medida', 'Panel de administración', 'Integraciones / API', 'Soporte prioritario 6 meses']"
+        cta="Agendar llamada"
+      />
+      <app-pricing-card
+        name="A medida"
+        price="Custom"
+        period=""
+        description="Proyectos complejos y automatización."
+        [features]="['Alcance definido contigo', 'Automatizaciones de procesos', 'Equipo dedicado', 'SLA garantizado']"
+        cta="Contáctanos"
+      />
+    </div>
+  </div>
+</section>
