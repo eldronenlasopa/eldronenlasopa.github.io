@@ -110,8 +110,18 @@ a:hover {
 }
 
 .grecaptcha-badge {
-  left: 12px !important;
-  right: auto !important;
+  right: clamp(16px, 3vw, 28px) !important;
+  left: auto !important;
   bottom: 12px !important;
   z-index: 90 !important;
+  transition: width 180ms ease !important;
+}
+
+.grecaptcha-badge:hover,
+.grecaptcha-badge:focus-within {
+  width: 256px !important;
+}
+
+.whatsapp-fab {
+  bottom: clamp(88px, calc(3vw + 60px), 104px) !important;
 }
