@@ -1,0 +1,13 @@
+# Node
+/node_modules
+
+# Visual Studio Code
+.vscode/*
+
+# Miscellaneous
+/.angular
+/dist
+
+# System files
+.DS_Store
+Thumbs.db
