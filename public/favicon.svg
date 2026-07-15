@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <linearGradient id="hud" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#22D3EE"></stop>
+      <stop offset="1" stop-color="#FF6B35"></stop>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="14" fill="#0B0F1A"></rect>
+  <rect x="1.5" y="1.5" width="61" height="61" rx="12.5" fill="none" stroke="url(#hud)" stroke-width="2"></rect>
+  <text x="12" y="43" font-family="&#39;JetBrains Mono&#39;,&#39;SFMono-Regular&#39;,ui-monospace,monospace" font-size="30" font-weight="700" fill="#22D3EE">~/</text>
+  <rect x="42" y="24" width="10" height="19" rx="1.5" fill="#FF6B35"></rect>
+</svg>
