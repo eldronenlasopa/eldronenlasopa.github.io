@@ -30,7 +30,6 @@ yarn-error.log
 .history/*
 
 # Miscellaneous
-.claude
 /.angular
 /app-eldronenlasopa-web
 /dist

@@ -1,0 +1,35 @@
+<!-- @dsCard group="Components" viewport="1000x520" name="Marketing — PricingCard" subtitle="Grilla de planes con plan destacado" -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../../styles.css">
+<style>
+  body { margin: 0; font-family: var(--font-body); background: var(--surface-page); }
+  .grid { padding: 40px 24px; display: flex; gap: 22px; justify-content: center; align-items: stretch; flex-wrap: wrap; }
+</style>
+</head>
+<body>
+<div id="root" class="grid"></div>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="../../_ds_bundle.js"></script>
+<script type="text/babel">
+  const { PricingCard } = window.ElDronEnLaSopaDesignSystem_5a2264;
+  function Demo() {
+    return (
+      <>
+        <PricingCard name="Emprende" price="S/ 1,200" description="Para lanzar tu presencia."
+          features={['Landing page a medida','Formulario de contacto','Hosting 1 año','2 rondas de ajustes']} cta="Empezar" />
+        <PricingCard name="Crece" price="S/ 3,500" featured description="Aplicación web completa."
+          features={['App web a medida','Panel de administración','Integraciones / API','Soporte prioritario']} cta="Agendar llamada" />
+        <PricingCard name="A medida" price="Custom" period="" description="Proyectos complejos."
+          features={['Alcance definido contigo','Automatizaciones','Equipo dedicado','SLA garantizado']} cta="Contáctanos" />
+      </>
+    );
+  }
+  ReactDOM.createRoot(document.getElementById('root')).render(<Demo />);
+</script>
+</body>
+</html>

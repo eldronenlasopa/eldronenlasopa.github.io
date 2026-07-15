@@ -1,0 +1,53 @@
+<!-- @dsCard group="Components" viewport="700x300" name="Actions — Button & IconButton" subtitle="Pill CTAs en 5 variantes, tamaños y estados" -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../../styles.css">
+<style>
+  body { margin: 0; background: var(--surface-page); font-family: var(--font-body); }
+  .wrap { padding: 28px 24px; display: flex; flex-direction: column; gap: 20px; }
+  .row { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .dark { background: var(--surface-inverse); padding: 20px 24px; border-radius: var(--radius-md); }
+  .lbl { font-family: var(--font-mono); font-size: 11px; letter-spacing: var(--ls-label); text-transform: uppercase; color: var(--text-muted); width: 100%; }
+</style>
+</head>
+<body>
+<div id="root" class="wrap"></div>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="../../_ds_bundle.js"></script>
+<script type="text/babel">
+  const { Button, IconButton } = window.ElDronEnLaSopaDesignSystem_5a2264;
+  function Demo() {
+    return (
+      <>
+        <div className="row">
+          <span className="lbl">Variantes</span>
+          <Button variant="primary">Solicitar propuesta</Button>
+          <Button variant="secondary">Ver planes</Button>
+          <Button variant="outline">Servicios</Button>
+          <Button variant="ghost">Cancelar</Button>
+        </div>
+        <div className="row">
+          <span className="lbl">Tamaños · icono · estado</span>
+          <Button size="sm">Pequeño</Button>
+          <Button size="md" iconRight={<span>→</span>}>Con icono</Button>
+          <Button size="lg">Grande</Button>
+          <Button disabled>Deshabilitado</Button>
+          <IconButton label="Menú" variant="outline">☰</IconButton>
+          <IconButton label="Cerrar" variant="solid">✕</IconButton>
+        </div>
+        <div className="dark row">
+          <span className="lbl" style={{color:'var(--text-inverse-muted)'}}>Sobre superficie oscura</span>
+          <Button variant="inverse">Empezar ahora</Button>
+          <Button variant="primary">Contáctanos</Button>
+        </div>
+      </>
+    );
+  }
+  ReactDOM.createRoot(document.getElementById('root')).render(<Demo />);
+</script>
+</body>
+</html>
