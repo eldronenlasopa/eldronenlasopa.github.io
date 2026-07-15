@@ -1,1 +1,7 @@
 <router-outlet />
+
+@if (showLoader()) {
+  <div class="fixed inset-0 z-[100]">
+    <app-loader (completed)="finishLoader()" />
+  </div>
+}

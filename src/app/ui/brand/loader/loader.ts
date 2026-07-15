@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, signal } from '@angular/core';
+import { Component, DestroyRef, inject, output, signal } from '@angular/core';
 
 interface BootLine {
   cmd: string;
@@ -20,6 +20,7 @@ const BOOT_LINES: BootLine[] = [
   styleUrl: './loader.css',
 })
 export class Loader {
+  readonly completed = output<void>();
   readonly typed = signal('');
   readonly doneLines = signal<BootLine[]>([]);
   readonly currentLine = signal<BootLine | null>(BOOT_LINES[0]);
@@ -67,6 +68,8 @@ export class Loader {
     if (this.stopped) return;
     await this.wait(700);
     this.finished.set(true);
+    await this.wait(360);
+    if (!this.stopped) this.completed.emit();
   }
 
   private typeLine(full: string): Promise<void> {
