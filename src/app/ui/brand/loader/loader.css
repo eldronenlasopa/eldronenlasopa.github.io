@@ -1,0 +1,48 @@
+@keyframes dl-scan {
+  0% {
+    transform: translateY(-100%);
+  }
+  100% {
+    transform: translateY(2200%);
+  }
+}
+@keyframes dl-blink {
+  0%,
+  49% {
+    opacity: 1;
+  }
+  50%,
+  100% {
+    opacity: 0;
+  }
+}
+@keyframes dl-orbit {
+  from {
+    transform: rotate(0deg) translateX(78px) rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg) translateX(78px) rotate(-360deg);
+  }
+}
+@keyframes dl-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(34, 211, 238, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 22px 4px rgba(34, 211, 238, 0.35);
+  }
+}
+
+.dl-scan-line {
+  animation: dl-scan 2.6s linear infinite;
+}
+.dl-cursor {
+  animation: dl-blink 1s step-end infinite;
+}
+.dl-orbit-dot {
+  animation: dl-orbit 2.4s linear infinite;
+}
+.dl-core {
+  animation: dl-pulse 1.8s var(--ease-in-out) infinite;
+}

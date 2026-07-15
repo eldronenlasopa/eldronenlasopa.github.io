@@ -1,0 +1,39 @@
+<div
+  class="relative flex min-h-screen items-center justify-center overflow-hidden bg-[image:var(--gradient-ink)] p-6"
+>
+  <div
+    class="pointer-events-none absolute inset-0 bg-[image:var(--texture-grid)] bg-[length:var(--texture-grid-size)] opacity-40 [mask-image:radial-gradient(circle_at_50%_0%,#000,transparent_70%)]"
+  ></div>
+
+  <app-card class="relative w-[min(400px,100%)]" padding="0">
+    <form (ngSubmit)="onSubmit()" class="flex flex-col gap-5 p-8">
+      <div class="mb-1 flex justify-center">
+        <app-wordmark size="lg" />
+      </div>
+      <div class="text-center">
+        <h1 class="m-0 font-display text-xl font-bold text-text-strong">Acceso de clientes</h1>
+        <p class="m-1 mt-1.5 font-body text-sm text-text-muted">Ingresa a tu panel de proyectos y tickets.</p>
+      </div>
+
+      <app-input
+        label="Correo"
+        type="email"
+        placeholder="tucorreo@empresa.com"
+        [required]="true"
+        [value]="email()"
+        (valueChange)="email.set($event)"
+      />
+      <app-input
+        label="Contraseña"
+        type="password"
+        placeholder="••••••••"
+        [required]="true"
+        [value]="password()"
+        (valueChange)="password.set($event)"
+      />
+
+      <app-button type="submit" variant="primary" size="lg" [fullWidth]="true">Entrar</app-button>
+      <p class="m-0 text-center font-mono text-xs text-text-faint">Demo: cualquier contraseña funciona.</p>
+    </form>
+  </app-card>
+</div>

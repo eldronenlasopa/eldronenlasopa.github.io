@@ -1,6 +1,9 @@
-<app-header class="sticky top-0 z-50" />
+<app-header class="sticky top-0 z-50" [links]="headerLinks" (ctaClicked)="goToProposal()" />
 <app-hero-section />
+<app-clients-section />
 <app-services-section />
 <app-pricing-section />
+<app-reviews-section />
 <app-contact-section />
 <app-footer />
+<app-whatsapp-fab />

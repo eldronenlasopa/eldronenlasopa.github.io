@@ -1,0 +1,75 @@
+<section id="reviews" class="relative overflow-hidden bg-surface-page px-8 py-24">
+  <div
+    class="pointer-events-none absolute -top-[140px] left-[40%] h-[460px] w-[460px] bg-[radial-gradient(circle,rgba(255,107,53,0.08),transparent_68%)]"
+  ></div>
+
+  <div class="relative mx-auto grid max-w-[1200px] items-center gap-16 md:grid-cols-2">
+    <div>
+      <div class="mb-3.5 font-mono text-[13px] uppercase tracking-[0.14em] text-brand-orange-600">// Reseñas</div>
+      <h2 class="m-0 mb-6 font-display text-4xl font-bold leading-[1.15] tracking-[-0.03em] text-text-strong">
+        Clientes que recomiendan nuestro trabajo
+      </h2>
+
+      <div class="mb-7 inline-flex items-center gap-4 rounded-lg border border-border-subtle bg-surface-card px-5 py-3.5 shadow-sm">
+        <span class="font-display text-[40px] leading-none font-bold text-text-strong">4.9</span>
+        <span class="h-10 w-px bg-border-subtle"></span>
+        <span>
+          <span class="inline-flex gap-0.5 text-[17px] text-brand-yellow" aria-label="5 de 5">
+            @for (star of stars; track star) {
+              <span>★</span>
+            }
+          </span>
+          <div class="mt-1 text-[13px] text-text-muted">basado en 40+ proyectos</div>
+        </span>
+      </div>
+
+      <div class="flex flex-wrap gap-3">
+        @for (review of reviews; track review.name; let i = $index) {
+          <button
+            type="button"
+            [attr.title]="review.name"
+            [class]="avatarButtonClasses(i)"
+            [style.borderColor]="active() === i ? review.color : 'transparent'"
+            (click)="select(i)"
+          >
+            <span [class]="avatarClasses(i)">{{ review.initials }}</span>
+          </button>
+        }
+      </div>
+    </div>
+
+    <div class="relative overflow-hidden rounded-xl bg-[image:var(--gradient-ink)] p-11 text-text-on-inverse shadow-lg">
+      <div
+        class="pointer-events-none absolute inset-0 bg-[image:var(--texture-grid)] bg-[length:var(--texture-grid-size)] opacity-40 [mask-image:radial-gradient(circle_at_80%_10%,#000,transparent_70%)]"
+      ></div>
+      <div
+        class="pointer-events-none absolute -top-[60px] -right-[30px] h-[260px] w-[260px] rounded-full"
+        [style.background]="'radial-gradient(circle, ' + activeReview().color + '33, transparent 66%)'"
+      ></div>
+      <div class="pointer-events-none absolute top-2.5 right-6 font-display text-[150px] leading-none text-white/[0.06]">
+        &rdquo;
+      </div>
+
+      <div class="relative">
+        <span class="inline-flex gap-0.5 text-lg text-brand-yellow" [attr.aria-label]="activeReview().rating + ' de 5'">
+          @for (star of stars; track star) {
+            <span [class.opacity-25]="star >= activeReview().rating">★</span>
+          }
+        </span>
+        <p class="my-5 mb-7 font-display text-2xl font-medium leading-[1.4] text-text-on-inverse">
+          {{ activeReview().quote }}
+        </p>
+        <div class="flex items-center gap-3.5">
+          <span
+            class="flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-full bg-[image:var(--gradient-hud)] font-display text-[17px] font-bold text-ink-950"
+            >{{ activeReview().initials }}</span
+          >
+          <div>
+            <div class="text-base font-semibold text-text-on-inverse">{{ activeReview().name }}</div>
+            <div class="text-sm text-text-inverse-muted">{{ activeReview().role }} · {{ activeReview().company }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

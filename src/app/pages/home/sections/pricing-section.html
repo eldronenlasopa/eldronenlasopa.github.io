@@ -14,6 +14,7 @@
         description="Para lanzar tu presencia digital."
         [features]="['Landing page a medida', 'Formulario de contacto', 'Hosting 1 año incluido', '2 rondas de ajustes']"
         cta="Empezar"
+        (ctaClicked)="goToProposal()"
       />
       <app-pricing-card
         name="Crece"
@@ -22,6 +23,7 @@
         description="Aplicación web completa a medida."
         [features]="['App web a medida', 'Panel de administración', 'Integraciones / API', 'Soporte prioritario 6 meses']"
         cta="Agendar llamada"
+        (ctaClicked)="goToProposal()"
       />
       <app-pricing-card
         name="A medida"
@@ -30,6 +32,7 @@
         description="Proyectos complejos y automatización."
         [features]="['Alcance definido contigo', 'Automatizaciones de procesos', 'Equipo dedicado', 'SLA garantizado']"
         cta="Contáctanos"
+        (ctaClicked)="goToProposal()"
       />
     </div>
   </div>

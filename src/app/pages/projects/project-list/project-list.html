@@ -1,0 +1,171 @@
+<div class="min-h-screen bg-surface-page font-body">
+  <header
+    class="relative overflow-hidden bg-[image:var(--gradient-ink)] px-5 pt-[clamp(40px,6vw,72px)] pb-[clamp(56px,7vw,88px)] text-text-on-inverse sm:px-10"
+  >
+    <div
+      class="pointer-events-none absolute inset-0 bg-[image:var(--texture-grid)] bg-[length:var(--texture-grid-size)] opacity-45 [mask-image:radial-gradient(circle_at_70%_0%,#000,transparent_72%)]"
+    ></div>
+    <div
+      class="pointer-events-none absolute -top-[120px] -right-[60px] h-[460px] w-[460px] bg-[radial-gradient(circle,rgba(34,211,238,0.20),transparent_66%)]"
+    ></div>
+
+    <div class="relative mx-auto max-w-[1200px]">
+      <div class="mb-11 flex flex-wrap items-center justify-between gap-4">
+        <app-wordmark tone="light" size="sm" />
+        <app-button variant="inverse" size="sm" (clicked)="requestProposal()">Solicitar propuesta</app-button>
+      </div>
+
+      <div class="mb-4 font-mono text-[13px] tracking-[var(--ls-label)] text-brand-cyan uppercase">// Proyectos</div>
+      <h1
+        class="m-0 max-w-[720px] text-balance font-display text-[clamp(34px,6vw,60px)] font-bold leading-[var(--lh-tight)] tracking-[var(--ls-tight)]"
+      >
+        Lo que hemos construido para empresas como la tuya
+      </h1>
+
+      <div class="mt-9 flex flex-wrap gap-10">
+        @for (s of stats; track s[1]) {
+          <div>
+            <div class="font-display text-[34px] font-bold text-brand-orange">{{ s[0] }}</div>
+            <div class="text-[13.5px] text-text-inverse-muted">{{ s[1] }}</div>
+          </div>
+        }
+      </div>
+    </div>
+  </header>
+
+  <div class="mx-auto max-w-[1200px] px-5 pt-[clamp(28px,4vw,44px)] pb-[clamp(56px,8vw,96px)] sm:px-10">
+    <div class="sticky top-3 z-[5] mb-7 flex flex-wrap items-center justify-between gap-4">
+      <div class="flex flex-wrap gap-2.5">
+        @for (f of filters; track f) {
+          <button
+            type="button"
+            (click)="setFilter(f)"
+            class="inline-flex cursor-pointer items-center gap-2 rounded-pill border-[1.5px] px-4 py-2.5 font-body text-[14.5px] transition-all duration-150 ease-out"
+            [class]="
+              filter() === f
+                ? 'border-brand-orange bg-brand-orange font-semibold text-text-on-brand shadow-brand'
+                : 'border-border-default bg-surface-card font-medium text-text-body'
+            "
+          >
+            {{ f }}
+            <span class="font-mono text-xs opacity-70">{{ filterCount(f) }}</span>
+          </button>
+        }
+      </div>
+
+      <div class="relative min-w-[240px] max-w-[340px] flex-1">
+        <span class="pointer-events-none absolute top-1/2 left-3.5 -translate-y-1/2 text-[15px] text-text-faint">⌕</span>
+        <input
+          type="text"
+          [value]="query()"
+          (input)="setQuery($any($event.target).value)"
+          placeholder="Buscar por nombre, cliente o tecnología…"
+          class="w-full rounded-pill border-[1.5px] border-border-default bg-surface-card py-[11px] pr-[38px] pl-[38px] font-body text-[14.5px] text-text-body outline-none focus:border-brand-cyan focus:shadow-glow-soft-cyan"
+        />
+        @if (query()) {
+          <button
+            type="button"
+            (click)="clearQuery()"
+            class="absolute top-1/2 right-3 -translate-y-1/2 cursor-pointer border-0 bg-transparent text-base leading-none text-text-faint"
+          >
+            ×
+          </button>
+        }
+      </div>
+    </div>
+
+    <div class="mb-5 font-mono text-[12.5px] text-text-muted">
+      {{ filtered().length }} resultado{{ filtered().length === 1 ? '' : 's' }}{{ query() ? ' para “' + query() + '”' : '' }}
+    </div>
+
+    @if (shown().length > 0) {
+      <div class="grid grid-cols-[repeat(auto-fill,minmax(min(100%,300px),1fr))] gap-6">
+        @for (p of shown(); track p.slug) {
+          <article
+            (click)="openProject(p.slug)"
+            class="group relative cursor-pointer overflow-hidden rounded-lg border border-border-subtle bg-surface-card shadow-xs transition-shadow duration-200 ease-out hover:shadow-lg"
+          >
+            <div class="relative flex h-[132px] items-center justify-center overflow-hidden bg-[image:var(--gradient-ink)]">
+              <div
+                class="absolute inset-0 bg-[image:var(--texture-grid)] bg-[length:var(--texture-grid-size)] opacity-50"
+              ></div>
+              <span
+                class="relative text-[52px] transition-transform duration-200 ease-out group-hover:scale-110"
+                [style.color]="p.color"
+                [style.text-shadow]="'0 0 26px ' + p.color + '66'"
+                >{{ p.glyph }}</span
+              >
+              <span
+                class="absolute top-3.5 right-3.5 rounded-pill border border-[var(--glass-border)] bg-[var(--glass-dark)] px-2.5 py-1 font-mono text-xs text-brand-cyan-300"
+                >{{ p.year }}</span
+              >
+            </div>
+            <div class="p-[22px]">
+              <div class="mb-2.5 flex items-center gap-2">
+                <app-badge tone="brand">{{ p.cat }}</app-badge>
+                <span class="font-mono text-[13px] text-text-faint">{{ p.client }}</span>
+              </div>
+              <h3 class="m-0 mb-2 font-display text-xl font-semibold text-text-strong">{{ p.title }}</h3>
+              <p class="m-0 mb-4 text-[14.5px] leading-[var(--lh-body)] text-text-muted">{{ p.desc }}</p>
+              <div class="mb-4 flex flex-wrap gap-2">
+                @for (t of p.tags; track t) {
+                  <app-tag>{{ t }}</app-tag>
+                }
+              </div>
+              <div class="flex items-center justify-between border-t border-border-subtle pt-3.5">
+                <span class="font-mono text-[13px] font-semibold text-brand-orange-600">{{ p.metric }}</span>
+                <span
+                  class="text-sm font-semibold text-text-link transition-transform duration-200 ease-out group-hover:translate-x-1"
+                  >Ver caso →</span
+                >
+              </div>
+            </div>
+          </article>
+        }
+      </div>
+    } @else {
+      <div class="py-16 text-center text-text-muted">
+        <div class="mb-3 text-4xl opacity-50">⌕</div>
+        <div class="mb-1.5 font-display text-xl font-semibold text-text-strong">Sin resultados</div>
+        <div class="text-[14.5px]">Prueba con otro término o cambia el filtro.</div>
+      </div>
+    }
+
+    @if (pageCount() > 1) {
+      <div class="mt-11 flex items-center justify-center gap-2">
+        <button
+          type="button"
+          [disabled]="safePage() === 1"
+          (click)="prevPage()"
+          class="h-10 min-w-10 rounded-md border-[1.5px] border-border-default bg-surface-card font-mono text-[15px] text-text-body transition-all duration-150 ease-out disabled:cursor-not-allowed disabled:text-text-faint disabled:opacity-50"
+        >
+          ←
+        </button>
+        @for (n of pages(); track n) {
+          <button
+            type="button"
+            (click)="goToPage(n)"
+            class="h-10 min-w-10 rounded-md border-[1.5px] font-mono text-sm transition-all duration-150 ease-out"
+            [class]="
+              n === safePage()
+                ? 'border-brand-orange bg-brand-orange font-bold text-text-on-brand shadow-brand'
+                : 'border-border-default bg-surface-card font-medium text-text-body'
+            "
+          >
+            {{ n }}
+          </button>
+        }
+        <button
+          type="button"
+          [disabled]="safePage() === pageCount()"
+          (click)="nextPage()"
+          class="h-10 min-w-10 rounded-md border-[1.5px] border-border-default bg-surface-card font-mono text-[15px] text-text-body transition-all duration-150 ease-out disabled:cursor-not-allowed disabled:text-text-faint disabled:opacity-50"
+        >
+          →
+        </button>
+      </div>
+    }
+  </div>
+
+  <app-whatsapp-fab />
+</div>

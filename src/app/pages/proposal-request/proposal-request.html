@@ -1,0 +1,178 @@
+<div class="grid min-h-screen grid-cols-1 bg-surface-page font-body lg:grid-cols-2">
+  <!-- Aside -->
+  <aside class="relative overflow-hidden bg-[image:var(--gradient-ink)] p-8 text-text-on-inverse sm:p-12 lg:p-14">
+    <div
+      class="pointer-events-none absolute inset-0 bg-[image:var(--texture-grid)] bg-[length:var(--texture-grid-size)] opacity-40 [mask-image:radial-gradient(circle_at_30%_20%,#000,transparent_70%)]"
+    ></div>
+    <div
+      class="pointer-events-none absolute -bottom-36 -left-20 h-[420px] w-[420px] bg-[radial-gradient(circle,rgba(255,107,53,0.22),transparent_66%)]"
+    ></div>
+
+    <div class="relative mx-auto max-w-[380px]">
+      <app-wordmark tone="light" size="sm" />
+
+      <div class="mt-10 mb-3.5 font-mono text-xs tracking-[var(--ls-label)] text-brand-cyan uppercase">// Solicitar propuesta</div>
+      <h1 class="m-0 font-display text-[clamp(28px,4vw,38px)] font-bold leading-[var(--lh-heading)] tracking-[var(--ls-tight)]">
+        Tu idea, con precio y plazo en 24 horas
+      </h1>
+      <p class="mt-[18px] text-base leading-[var(--lh-body)] text-text-inverse-muted">
+        Cuéntanos qué necesitas. Te devolvemos una propuesta clara de alcance y presupuesto, sin compromiso.
+      </p>
+
+      <ol class="relative m-0 mt-10 flex list-none flex-col gap-1 p-0">
+        @for (label of steps; track label; let i = $index) {
+          <li class="flex items-center gap-3.5 py-2.5">
+            <span
+              class="relative inline-flex h-[34px] w-[34px] shrink-0 items-center justify-center rounded-full border font-mono text-sm font-bold transition-all duration-200 ease-out"
+              [class]="stepCircleClasses(i)"
+            >
+              {{ i < step() ? '✓' : i + 1 }}
+              @if (i < steps.length - 1) {
+                <span class="absolute top-[34px] left-1/2 h-[22px] w-px -translate-x-1/2" [class]="stepConnectorClass(i)"></span>
+              }
+            </span>
+            <span class="text-[15px]" [class]="stepLabelClasses(i)">{{ label }}</span>
+          </li>
+        }
+      </ol>
+    </div>
+  </aside>
+
+  <!-- Form panel -->
+  <main class="flex items-center p-8 sm:p-12 lg:p-16">
+    <div class="mx-auto w-full max-w-[560px]">
+      @if (step() === 0) {
+        <div>
+          <h2 class="m-0 mb-1.5 font-display text-[26px] font-bold text-text-strong">¿Qué quieres construir?</h2>
+          <p class="m-0 mb-7 text-[15.5px] text-text-muted">Elige el tipo de proyecto que más se acerca.</p>
+          <div class="grid grid-cols-1 gap-3.5 sm:grid-cols-2">
+            @for (t of projectTypes; track t.id) {
+              <button
+                type="button"
+                class="cursor-pointer rounded-lg border-[1.5px] p-[18px] text-left transition-all duration-200 ease-out"
+                [class]="typeCardClasses(t.id)"
+                (click)="type.set(t.id)"
+              >
+                <div class="mb-2.5 text-2xl" [class]="type() === t.id ? 'text-brand-orange' : 'text-text-muted'">{{ t.icon }}</div>
+                <div class="font-display text-base font-semibold text-text-strong">{{ t.title }}</div>
+                <div class="mt-[3px] text-[13.5px] text-text-muted">{{ t.desc }}</div>
+              </button>
+            }
+          </div>
+        </div>
+      }
+
+      @if (step() === 1) {
+        <div>
+          <h2 class="m-0 mb-1.5 font-display text-[26px] font-bold text-text-strong">Alcance del proyecto</h2>
+          <p class="m-0 mb-7 text-[15.5px] text-text-muted">Nos ayuda a dimensionar la propuesta. Todo es orientativo.</p>
+
+          <div class="mb-6">
+            <label class="mb-3 block font-body text-sm font-semibold text-text-strong">Presupuesto estimado</label>
+            <div class="flex flex-wrap gap-2.5">
+              @for (b of budgets; track b) {
+                <button
+                  type="button"
+                  class="cursor-pointer rounded-pill border-[1.5px] px-4 py-2.5 font-body text-[14.5px] transition-all duration-150 ease-out"
+                  [class]="chipClasses(budget() === b)"
+                  (click)="budget.set(b)"
+                >
+                  {{ b }}
+                </button>
+              }
+            </div>
+          </div>
+
+          <div class="mb-6">
+            <label class="mb-3 block font-body text-sm font-semibold text-text-strong">¿Para cuándo lo necesitas?</label>
+            <div class="flex flex-wrap gap-2.5">
+              @for (t of timelines; track t) {
+                <button
+                  type="button"
+                  class="cursor-pointer rounded-pill border-[1.5px] px-4 py-2.5 font-body text-[14.5px] transition-all duration-150 ease-out"
+                  [class]="chipClasses(timeline() === t)"
+                  (click)="timeline.set(t)"
+                >
+                  {{ t }}
+                </button>
+              }
+            </div>
+          </div>
+        </div>
+      }
+
+      @if (step() === 2) {
+        <div>
+          <h2 class="m-0 mb-1.5 font-display text-[26px] font-bold text-text-strong">¿Cómo te contactamos?</h2>
+          <p class="m-0 mb-7 text-[15.5px] text-text-muted">Respondemos en menos de 24 horas.</p>
+
+          <div class="grid grid-cols-1 gap-[18px] sm:grid-cols-2">
+            <app-input label="Nombre" placeholder="Tu nombre" [required]="true" [value]="name()" (valueChange)="name.set($event)" />
+            <app-input label="Empresa" placeholder="Opcional" [value]="company()" (valueChange)="company.set($event)" />
+          </div>
+          <div class="mt-[18px]">
+            <app-input
+              label="Email"
+              type="email"
+              placeholder="tu@correo.com"
+              [required]="true"
+              [value]="email()"
+              (valueChange)="email.set($event)"
+            />
+          </div>
+          <div class="mt-[18px]">
+            <app-textarea
+              label="Cuéntanos más (opcional)"
+              [rows]="4"
+              placeholder="Contexto, objetivos, referencias…"
+              [value]="message()"
+              (valueChange)="message.set($event)"
+            />
+          </div>
+        </div>
+      }
+
+      @if (step() === 3) {
+        <div class="py-5 text-center">
+          <div
+            class="mx-auto mb-6 flex h-[76px] w-[76px] items-center justify-center rounded-full bg-[image:var(--gradient-hud)] text-[34px] font-bold text-ink-950 shadow-glow-soft-cyan"
+          >
+            ✓
+          </div>
+          <h2 class="m-0 mb-2.5 font-display text-[30px] font-bold text-text-strong">¡Solicitud enviada!</h2>
+          <p class="mx-auto mb-6 max-w-[400px] text-base text-text-muted">
+            Gracias{{ name() ? ', ' + name() : '' }}. Revisaremos tu {{ typeLabel() ? typeLabel().toLowerCase() : 'proyecto' }} y te
+            enviaremos una propuesta a <strong class="text-text-strong">{{ email() || 'tu correo' }}</strong> en menos de 24 horas.
+          </p>
+          <div class="mb-8 flex flex-wrap justify-center gap-2.5">
+            @if (typeLabel()) {
+              <app-badge tone="brand">{{ typeLabel() }}</app-badge>
+            }
+            @if (budget()) {
+              <app-badge tone="neutral">{{ budget() }}</app-badge>
+            }
+            @if (timeline()) {
+              <app-badge tone="info">{{ timeline() }}</app-badge>
+            }
+          </div>
+          <app-button variant="outline" (clicked)="reset()">Enviar otra solicitud</app-button>
+        </div>
+      }
+
+      @if (step() < 3) {
+        <div class="mt-10 flex items-center justify-between gap-4 border-t border-border-subtle pt-6">
+          <div class="font-mono text-xs tracking-[var(--ls-label)] text-text-faint uppercase">Paso {{ step() + 1 }} de 3</div>
+          <div class="flex gap-3">
+            @if (step() > 0) {
+              <app-button variant="ghost" (clicked)="back()">Atrás</app-button>
+            }
+            <app-button variant="primary" [disabled]="!canNext()" (clicked)="next()">
+              {{ step() === 2 ? 'Enviar solicitud' : 'Continuar' }}
+              <span slot="icon-right">→</span>
+            </app-button>
+          </div>
+        </div>
+      }
+    </div>
+  </main>
+</div>

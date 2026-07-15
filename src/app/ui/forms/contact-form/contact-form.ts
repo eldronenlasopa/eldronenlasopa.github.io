@@ -1,4 +1,5 @@
 import { Component, input, output, signal } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { Input } from '../input/input';
 import { Textarea } from '../textarea/textarea';
 import { Select } from '../select/select';
@@ -16,7 +17,7 @@ const SERVICES = ['Aplicación web', 'Página / landing', 'Automatización', 'In
 /** Composed lead-capture form used across marketing surfaces. */
 @Component({
   selector: 'app-contact-form',
-  imports: [Input, Textarea, Select, Button],
+  imports: [FormsModule, Input, Textarea, Select, Button],
   templateUrl: './contact-form.html',
 })
 export class ContactForm {

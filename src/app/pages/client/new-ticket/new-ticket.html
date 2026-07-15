@@ -1,0 +1,31 @@
+<div class="flex min-h-screen items-center justify-center bg-surface-page p-6">
+  <app-card class="w-[min(560px,100%)]" padding="0">
+    <form (ngSubmit)="onSubmit()" class="flex flex-col gap-5 p-8">
+      <div>
+        <div class="font-mono text-[11px] tracking-[var(--ls-label)] text-text-faint uppercase">Panel de cliente</div>
+        <h1 class="m-0 mt-0.5 font-display text-2xl font-bold text-text-strong">Nuevo ticket de soporte</h1>
+      </div>
+
+      <app-input
+        label="Asunto"
+        placeholder="Describe el problema en pocas palabras"
+        [required]="true"
+        [value]="title()"
+        (valueChange)="title.set($event)"
+      />
+      <app-select label="Prioridad" [options]="priorities" [value]="priority()" (valueChange)="setPriority($event)" />
+      <app-textarea
+        label="Descripción"
+        placeholder="Pasos para reproducir, capturas, contexto adicional…"
+        [rows]="5"
+        [value]="description()"
+        (valueChange)="description.set($event)"
+      />
+
+      <div class="mt-2 flex justify-end gap-3">
+        <app-button type="button" variant="ghost" (clicked)="onCancel()">Cancelar</app-button>
+        <app-button type="submit" variant="primary">Crear ticket</app-button>
+      </div>
+    </form>
+  </app-card>
+</div>

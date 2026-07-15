@@ -1,0 +1,46 @@
+@keyframes pd-orbit {
+  from {
+    transform: rotate(0deg) translateX(120px) rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg) translateX(120px) rotate(-360deg);
+  }
+}
+@keyframes pd-orbit2 {
+  from {
+    transform: rotate(120deg) translateX(160px) rotate(-120deg);
+  }
+  to {
+    transform: rotate(480deg) translateX(160px) rotate(-480deg);
+  }
+}
+@keyframes pd-scan {
+  0% {
+    transform: translateY(-120%);
+  }
+  100% {
+    transform: translateY(560%);
+  }
+}
+@keyframes pd-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.pd-scan-line {
+  animation: pd-scan 3s linear infinite;
+}
+.pd-float {
+  animation: pd-float 4s var(--ease-in-out) infinite;
+}
+.pd-orbit-dot {
+  animation: pd-orbit 5s linear infinite;
+}
+.pd-orbit-dot-2 {
+  animation: pd-orbit2 7s linear infinite;
+}

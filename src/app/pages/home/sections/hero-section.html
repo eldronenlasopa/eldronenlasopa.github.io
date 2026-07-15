@@ -29,11 +29,12 @@
       </p>
 
       <div class="mt-9 flex flex-wrap gap-3.5">
-        <app-button variant="primary" size="lg">
+        <app-button variant="primary" size="lg" (clicked)="goToProposal()">
           Solicitar propuesta
           <span slot="icon-right">→</span>
         </app-button>
-        <app-button variant="inverse" size="lg">Ver proyectos</app-button>
+        <app-button variant="inverse" size="lg" (clicked)="goToProjects()">Ver proyectos</app-button>
+        <app-button variant="ghost-inverse" size="lg" (clicked)="goToClientArea()">Área de cliente</app-button>
       </div>
 
       <div class="mt-11 flex flex-wrap items-center gap-2.5">

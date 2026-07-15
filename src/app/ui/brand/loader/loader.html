@@ -1,0 +1,70 @@
+<div
+  class="relative flex min-h-screen items-center justify-center overflow-hidden bg-[image:var(--gradient-ink)] p-6 font-mono"
+>
+  <div
+    class="pointer-events-none absolute inset-0 bg-[image:var(--texture-grid)] bg-[length:var(--texture-grid-size)] opacity-40 [mask-image:radial-gradient(circle_at_50%_45%,#000,transparent_72%)]"
+  ></div>
+  <div
+    class="pointer-events-none absolute top-[20%] left-[30%] h-[400px] w-[400px] bg-[radial-gradient(circle,rgba(255,107,53,0.18),transparent_66%)]"
+  ></div>
+  <div
+    class="pointer-events-none absolute right-[25%] bottom-[15%] h-[380px] w-[380px] bg-[radial-gradient(circle,rgba(34,211,238,0.16),transparent_68%)]"
+  ></div>
+
+  <div
+    class="relative w-[min(520px,92vw)] overflow-hidden rounded-lg border border-[var(--glass-border)] bg-[var(--glass-dark)] shadow-glow-soft-cyan backdrop-blur-[var(--blur-glass)] transition-[opacity,transform] duration-[360ms] ease-out"
+    [class]="finished() ? 'opacity-0 scale-[0.97]' : 'opacity-100 scale-100'"
+  >
+    <div class="dl-scan-line pointer-events-none absolute top-0 right-0 left-0 h-10 bg-[linear-gradient(180deg,rgba(34,211,238,0.22),transparent)]"></div>
+
+    <div class="relative flex items-center gap-2 border-b border-[var(--glass-border)] px-4 py-[13px]">
+      <span class="h-[11px] w-[11px] rounded-full bg-brand-orange"></span>
+      <span class="h-[11px] w-[11px] rounded-full bg-brand-yellow"></span>
+      <span class="h-[11px] w-[11px] rounded-full bg-brand-cyan"></span>
+      <span class="ml-2.5 text-[12.5px] tracking-[var(--ls-label)] text-text-inverse-muted">dronlab — boot</span>
+    </div>
+
+    <div class="relative px-[22px] pt-6 pb-5">
+      <div class="mb-[22px] flex justify-center">
+        <div class="relative flex h-[88px] w-[88px] items-center justify-center">
+          <div
+            class="dl-core flex h-[46px] w-[46px] items-center justify-center rounded-full bg-[image:var(--gradient-hud)] text-xl font-bold text-ink-950"
+          >
+            ~/
+          </div>
+          <div class="dl-orbit-dot absolute top-1/2 left-1/2 -mt-[5px] -ml-[5px] h-2.5 w-2.5 rounded-full bg-brand-orange shadow-[0_0_12px_var(--brand-orange)]"></div>
+          <div class="absolute inset-0 rounded-full border border-dashed border-[var(--glass-border)]"></div>
+        </div>
+      </div>
+
+      <div class="min-h-[132px] text-[13.5px] leading-[1.85]">
+        @for (l of doneLines(); track $index) {
+          <div class="flex gap-2.5" [class.text-brand-cyan-300]="l.cmd.startsWith('$')" [class.text-text-on-inverse]="!l.cmd.startsWith('$')">
+            <span class="flex-1 overflow-hidden text-ellipsis whitespace-nowrap">{{ l.cmd }}</span>
+            @if (l.out) {
+              <span class="font-medium text-success">[{{ l.out }}]</span>
+            }
+          </div>
+        }
+        @if (currentLine(); as line) {
+          <div [class.text-brand-cyan-300]="line.cmd.startsWith('$')" [class.text-text-on-inverse]="!line.cmd.startsWith('$')">
+            {{ typed() }}<span class="dl-cursor ml-0.5 inline-block h-[15px] w-2 align-text-bottom bg-brand-orange"></span>
+          </div>
+        }
+      </div>
+
+      <div class="mt-[18px]">
+        <div class="mb-2 flex justify-between text-xs text-text-inverse-muted">
+          <span>cargando entorno</span>
+          <span class="text-brand-cyan">{{ progress() }}%</span>
+        </div>
+        <div class="h-1.5 overflow-hidden rounded-pill bg-white/[0.08]">
+          <div
+            class="h-full rounded-pill bg-[image:var(--gradient-hud)] shadow-[0_0_14px_rgba(34,211,238,0.5)] transition-[width] duration-[120ms] linear"
+            [style.width.%]="progress()"
+          ></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

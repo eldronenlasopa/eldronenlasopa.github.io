@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
+import { Router } from '@angular/router';
 import { PricingCard } from '../../../ui/marketing/pricing-card/pricing-card';
 
 @Component({
@@ -6,4 +7,10 @@ import { PricingCard } from '../../../ui/marketing/pricing-card/pricing-card';
   imports: [PricingCard],
   templateUrl: './pricing-section.html',
 })
-export class PricingSection {}
+export class PricingSection {
+  private readonly router = inject(Router);
+
+  goToProposal(): void {
+    this.router.navigateByUrl('/solicitar-propuesta');
+  }
+}
