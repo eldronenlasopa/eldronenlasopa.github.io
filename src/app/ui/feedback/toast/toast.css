@@ -1,0 +1,29 @@
+:host {
+  display: block;
+}
+
+.dl-toast {
+  animation: dl-toast-in var(--dur-base) var(--ease-out);
+}
+
+.dl-toast-ring {
+  animation: dl-ring-spin 2.4s linear infinite;
+}
+
+.dl-toast-bar {
+  animation: dl-toast-bar 4000ms linear forwards;
+}
+
+@keyframes dl-toast-in {
+  from { opacity: 0; transform: translateX(24px); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes dl-toast-bar {
+  from { transform: scaleX(1); }
+  to { transform: scaleX(0); }
+}
+
+@keyframes dl-ring-spin {
+  to { transform: rotate(360deg); }
+}

@@ -5,7 +5,9 @@ import { Input } from '../../ui/forms/input/input';
 import { Textarea } from '../../ui/forms/textarea/textarea';
 import { Wordmark } from '../../ui/brand/wordmark/wordmark';
 import { ApiService } from '../../core/api.service';
+import { DialogService } from '../../core/services/dialog.service';
 import { RecaptchaService } from '../../core/services/recaptcha.service';
+import { ToastService } from '../../core/services/toast.service';
 
 interface ProjectType { id: string; icon: string; title: string; desc: string; }
 const STEPS = ['Proyecto', 'Alcance', 'Contacto', 'Enviado'];
@@ -21,7 +23,10 @@ const TIMELINES = ['Lo antes posible', 'En 1–2 meses', 'En 3–6 meses', 'Solo
 @Component({ selector: 'app-proposal-request', imports: [Button, Badge, Input, Textarea, Wordmark], templateUrl: './proposal-request.html' })
 export class ProposalRequest {
   private readonly api = inject(ApiService);
+  private readonly dialog = inject(DialogService);
   private readonly recaptcha = inject(RecaptchaService);
+  private readonly toast = inject(ToastService);
+  private submitting = false;
   readonly captchaEnabled = this.recaptcha.enabled;
   readonly steps = STEPS; readonly projectTypes = PROJECT_TYPES; readonly budgets = BUDGETS; readonly timelines = TIMELINES;
   readonly step = signal(0); readonly type = signal(''); readonly budget = signal(''); readonly timeline = signal(''); readonly name = signal(''); readonly company = signal(''); readonly email = signal(''); readonly message = signal('');
@@ -34,7 +39,42 @@ export class ProposalRequest {
   stepLabelClasses(i: number): string { const active = i === this.step(); const done = i < this.step(); return active ? 'font-semibold text-text-on-inverse' : done ? 'font-medium text-brand-cyan-300' : 'font-medium text-text-inverse-muted'; }
   typeCardClasses(id: string): string { return this.type() === id ? 'bg-[rgba(255,107,53,0.06)] border-brand-orange shadow-brand' : 'bg-surface-card border-border-subtle shadow-xs'; }
   chipClasses(selected: boolean): string { return selected ? 'bg-brand-orange text-text-on-brand border-brand-orange font-semibold' : 'bg-surface-card text-text-body border-border-default font-medium'; }
-  async next(): Promise<void> { if (!this.canNext()) return; if (this.step() === 2) { const recaptchaToken = await this.recaptcha.execute('proposal'); this.api.createProposal({ type: this.type(), budget: this.budget(), timeline: this.timeline(), name: this.name(), company: this.company() || null, email: this.email(), message: this.message() || null, recaptchaToken }).subscribe({ next: () => this.step.set(3), error: () => window.alert('No pudimos enviar la solicitud. Inténtalo nuevamente.') }); return; } this.step.update(s => s + 1); }
+  async next(): Promise<void> {
+    if (!this.canNext() || this.submitting) return;
+
+    if (this.step() === 2) {
+      const confirmed = await this.dialog.confirm({
+        tone: 'brand',
+        title: '¿Enviar solicitud de propuesta?',
+        message: 'Confirma que tus datos y los detalles del proyecto son correctos.',
+        confirmLabel: 'Enviar solicitud',
+        cancelLabel: 'Revisar datos',
+      });
+      if (!confirmed) return;
+
+      this.submitting = true;
+      try {
+        const recaptchaToken = await this.recaptcha.execute('proposal');
+        this.api.createProposal({ type: this.type(), budget: this.budget(), timeline: this.timeline(), name: this.name(), company: this.company() || null, email: this.email(), message: this.message() || null, recaptchaToken }).subscribe({
+          next: () => {
+            this.submitting = false;
+            this.step.set(3);
+            this.toast.success('Solicitud enviada', 'Revisaremos tu proyecto y te contactaremos pronto.');
+          },
+          error: () => {
+            this.submitting = false;
+            this.toast.error('No pudimos enviar la solicitud', 'Inténtalo nuevamente en unos momentos.');
+          },
+        });
+      } catch {
+        this.submitting = false;
+        this.toast.error('No pudimos validar tu solicitud', 'Inténtalo nuevamente en unos momentos.');
+      }
+      return;
+    }
+
+    this.step.update(s => s + 1);
+  }
   back(): void { this.step.update(s => s - 1); }
   reset(): void { this.step.set(0); this.type.set(''); this.budget.set(''); this.timeline.set(''); this.name.set(''); this.company.set(''); this.email.set(''); this.message.set(''); }
 }

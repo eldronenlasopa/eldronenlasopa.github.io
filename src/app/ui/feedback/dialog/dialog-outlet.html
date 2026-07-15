@@ -1,0 +1,11 @@
+@if (dialogService.dialog(); as active) {
+  <app-dialog
+    [tone]="active.tone"
+    [title]="active.title"
+    [message]="active.message"
+    [confirmLabel]="active.confirmLabel"
+    [cancelLabel]="active.cancelLabel"
+    (confirmed)="dialogService.close(true)"
+    (cancelled)="dialogService.close(false)"
+  />
+}

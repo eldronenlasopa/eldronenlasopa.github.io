@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<!-- @template name="Homepage de marketing" description="Landing completa: hero, servicios, planes y contacto con header y footer del sistema" -->
+<helmet>
+<script src="./ds-base.js"></script>
+<style>
+  body { margin: 0; background: var(--surface-page); font-family: var(--font-body); }
+  a { color: var(--text-link); text-decoration: none; }
+  a:hover { color: var(--text-link-hover); }
+</style>
+</helmet>
+<div style="position: sticky; top: 0; z-index: 50;">
+  <x-import component-from-global-scope="ElDronEnLaSopaDesignSystem_5a2264.Header" hint-size="100%,72px"></x-import>
+</div>
+<x-import component="HeroSection" from="./HeroSection.jsx" hint-size="100%,520px"></x-import>
+<x-import component="ClientsSection" from="./ClientsSection.jsx" hint-size="100%,240px"></x-import>
+<x-import component="ServicesSection" from="./ServicesSection.jsx" hint-size="100%,600px"></x-import>
+<x-import component="PricingSection" from="./PricingSection.jsx" hint-size="100%,620px"></x-import>
+<x-import component="ReviewsSection" from="./ReviewsSection.jsx" hint-size="100%,520px"></x-import>
+<x-import component="ContactSection" from="./ContactSection.jsx" hint-size="100%,560px"></x-import>
+<x-import component-from-global-scope="ElDronEnLaSopaDesignSystem_5a2264.Footer" hint-size="100%,300px"></x-import>
+<x-import component-from-global-scope="WhatsAppFab" from="./WhatsAppFab.jsx" hint-size="60px,60px"></x-import>
+</x-dc>
+</body>
+</html>

@@ -1,0 +1,12 @@
+<div [class]="stackClasses()">
+  @for (toast of toastService.toasts(); track toast.id) {
+    <app-toast
+      class="pointer-events-auto"
+      [tone]="toast.tone"
+      [title]="toast.title"
+      [message]="toast.message"
+      [duration]="toast.duration"
+      (closed)="toastService.dismiss(toast.id)"
+    />
+  }
+</div>

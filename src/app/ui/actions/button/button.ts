@@ -1,6 +1,6 @@
 import { Component, computed, input, output } from '@angular/core';
 
-export type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'ghost' | 'inverse' | 'ghost-inverse';
+export type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'ghost' | 'inverse' | 'ghost-inverse' | 'glass' | 'danger';
 export type ButtonSize = 'sm' | 'md' | 'lg';
 
 const SIZE_CLASSES: Record<ButtonSize, string> = {
@@ -16,6 +16,8 @@ const VARIANT_CLASSES: Record<ButtonVariant, string> = {
   ghost: 'border-2 border-transparent bg-transparent text-text-body',
   inverse: 'border-2 border-transparent bg-white text-ink-950',
   'ghost-inverse': 'border-2 border-[var(--glass-border)] bg-transparent text-text-on-inverse hover:bg-white/5',
+  glass: 'border-2 border-[var(--glass-border)] bg-[var(--glass-dark)] text-text-on-inverse',
+  danger: 'border-2 border-transparent bg-danger text-white shadow-[0_0_20px_-6px_var(--danger)]',
 };
 
 /** Primary action control. `primary` (orange) for the main CTA, `inverse` on dark surfaces. */

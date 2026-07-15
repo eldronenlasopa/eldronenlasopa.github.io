@@ -1,7 +1,9 @@
 import { Component, inject } from '@angular/core';
 import { ContactForm } from '../../../ui/forms/contact-form/contact-form';
 import { ApiService } from '../../../core/api.service';
+import { DialogService } from '../../../core/services/dialog.service';
 import { RecaptchaService } from '../../../core/services/recaptcha.service';
+import { ToastService } from '../../../core/services/toast.service';
 import type { ContactFormValue } from '../../../ui/forms/contact-form/contact-form';
 
 const HIGHLIGHTS = ['Diagnóstico gratuito', 'Presupuesto sin compromiso', 'Equipo local, comunicación en español'];
@@ -9,14 +11,40 @@ const HIGHLIGHTS = ['Diagnóstico gratuito', 'Presupuesto sin compromiso', 'Equi
 @Component({ selector: 'app-contact-section', imports: [ContactForm], templateUrl: './contact-section.html' })
 export class ContactSection {
   private readonly api = inject(ApiService);
+  private readonly dialog = inject(DialogService);
   private readonly recaptcha = inject(RecaptchaService);
+  private readonly toast = inject(ToastService);
+  private submitting = false;
   readonly highlights = HIGHLIGHTS;
 
   async submit(value: ContactFormValue): Promise<void> {
-    const recaptchaToken = await this.recaptcha.execute('contact');
-    this.api.createContact({ name: value.name, company: null, email: value.email, message: `${value.service}: ${value.message}`, recaptchaToken }).subscribe({
-      next: () => window.alert('Mensaje enviado. Te responderemos en menos de 24 horas.'),
-      error: () => window.alert('No pudimos enviar el mensaje. Inténtalo nuevamente.'),
+    if (this.submitting) return;
+
+    const confirmed = await this.dialog.confirm({
+      tone: 'brand',
+      title: '¿Enviar información de contacto?',
+      message: 'Revisaremos tus datos y te responderemos en menos de 24 horas.',
+      confirmLabel: 'Enviar mensaje',
+      cancelLabel: 'Revisar datos',
     });
+    if (!confirmed) return;
+
+    this.submitting = true;
+    try {
+      const recaptchaToken = await this.recaptcha.execute('contact');
+      this.api.createContact({ name: value.name, company: null, email: value.email, message: `${value.service}: ${value.message}`, recaptchaToken }).subscribe({
+        next: () => {
+          this.submitting = false;
+          this.toast.success('Mensaje enviado', 'Te responderemos en menos de 24 horas.');
+        },
+        error: () => {
+          this.submitting = false;
+          this.toast.error('No pudimos enviar el mensaje', 'Inténtalo nuevamente en unos momentos.');
+        },
+      });
+    } catch {
+      this.submitting = false;
+      this.toast.error('No pudimos validar tu solicitud', 'Inténtalo nuevamente en unos momentos.');
+    }
   }
 }

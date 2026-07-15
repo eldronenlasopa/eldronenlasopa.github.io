@@ -1,0 +1,25 @@
+.dl-dialog-overlay {
+  animation: dl-dialog-overlay var(--dur-base) var(--ease-out);
+}
+
+.dl-dialog-panel {
+  animation: dl-dialog-panel var(--dur-base) var(--ease-out);
+}
+
+.dl-dialog-ring {
+  animation: dl-dialog-ring 2.8s linear infinite;
+}
+
+@keyframes dl-dialog-overlay {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes dl-dialog-panel {
+  from { opacity: 0; transform: translateY(16px) scale(0.97); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes dl-dialog-ring {
+  to { transform: rotate(360deg); }
+}
