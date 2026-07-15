@@ -110,15 +110,16 @@ a:hover {
 }
 
 .grecaptcha-badge {
-  right: clamp(16px, 3vw, 28px) !important;
+  right: 0 !important;
   left: auto !important;
   bottom: 12px !important;
+  width: 70px !important;
+  overflow: hidden !important;
   z-index: 90 !important;
   transition: width 180ms ease !important;
 }
 
-.grecaptcha-badge:hover,
-.grecaptcha-badge:focus-within {
+.grecaptcha-badge:hover {
   width: 256px !important;
 }
 
