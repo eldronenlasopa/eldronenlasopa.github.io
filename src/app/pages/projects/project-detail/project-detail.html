@@ -1,9 +1,4 @@
-@if (loading) {
-  <div class="flex min-h-screen flex-col items-center justify-center gap-4 bg-surface-page p-6 text-center font-body">
-    <div class="h-10 w-10 animate-spin rounded-full border-2 border-border-subtle border-t-brand-orange"></div>
-    <p class="m-0 text-text-muted">Cargando proyecto…</p>
-  </div>
-} @else if (notFound || !project) {
+@if (notFound() || !project) {
   <div class="flex min-h-screen flex-col items-center justify-center gap-[18px] bg-surface-page p-6 text-center font-body">
     <div class="text-[46px] opacity-50">◇</div>
     <h1 class="m-0 font-display text-2xl text-text-strong">Proyecto no encontrado</h1>
