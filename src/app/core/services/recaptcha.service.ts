@@ -13,10 +13,15 @@ declare global {
 @Injectable({ providedIn: 'root' })
 export class RecaptchaService {
   private scriptPromise?: Promise<void>;
+  readonly enabled = Boolean(environment.recaptchaSiteKey);
+
+  load(): Promise<void> {
+    return this.enabled ? this.loadScript() : Promise.resolve();
+  }
 
   async execute(action: string): Promise<string | null> {
     if (!environment.recaptchaSiteKey) return null;
-    await this.loadScript();
+    await this.load();
     if (!window.grecaptcha) return null;
     return new Promise(resolve => window.grecaptcha!.ready(() =>
       window.grecaptcha!.execute(environment.recaptchaSiteKey, { action }).then(resolve).catch(() => resolve(null))));

@@ -22,9 +22,12 @@ const TIMELINES = ['Lo antes posible', 'En 1–2 meses', 'En 3–6 meses', 'Solo
 export class ProposalRequest {
   private readonly api = inject(ApiService);
   private readonly recaptcha = inject(RecaptchaService);
+  readonly captchaEnabled = this.recaptcha.enabled;
   readonly steps = STEPS; readonly projectTypes = PROJECT_TYPES; readonly budgets = BUDGETS; readonly timelines = TIMELINES;
   readonly step = signal(0); readonly type = signal(''); readonly budget = signal(''); readonly timeline = signal(''); readonly name = signal(''); readonly company = signal(''); readonly email = signal(''); readonly message = signal('');
   readonly typeLabel = computed(() => this.projectTypes.find(t => t.id === this.type())?.title ?? '');
+
+  constructor() { void this.recaptcha.load().catch(() => undefined); }
   readonly canNext = computed(() => this.step() === 0 ? !!this.type() : this.step() === 1 ? !!this.budget() && !!this.timeline() : this.step() === 2 ? !!this.name() && !!this.email() : true);
   stepCircleClasses(i: number): string { const active = i === this.step(); const done = i < this.step(); if (active) return 'bg-[image:var(--gradient-hud)] text-ink-950 border-brand-cyan shadow-glow-soft-cyan'; if (done) return 'bg-[rgba(34,211,238,0.14)] text-brand-cyan border-brand-cyan'; return 'bg-[var(--glass-dark)] text-text-inverse-muted border-[var(--glass-border)]'; }
   stepConnectorClass(i: number): string { return i < this.step() ? 'bg-brand-cyan' : 'bg-[var(--glass-border)]'; }

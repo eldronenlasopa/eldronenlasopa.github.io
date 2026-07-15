@@ -108,3 +108,7 @@ a {
 a:hover {
   color: var(--text-link-hover);
 }
+
+.grecaptcha-badge {
+  z-index: 90 !important;
+}

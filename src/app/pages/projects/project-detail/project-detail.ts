@@ -1,6 +1,6 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { switchMap, tap } from 'rxjs';
+import { switchMap, tap, timeout } from 'rxjs';
 import { Badge } from '../../../ui/data-display/badge/badge';
 import { Button } from '../../../ui/actions/button/button';
 import { Wordmark } from '../../../ui/brand/wordmark/wordmark';
@@ -28,7 +28,7 @@ export class ProjectDetail implements OnInit {
   ngOnInit(): void {
     this.route.paramMap.pipe(
       tap(() => { this.loading = true; this.notFound = false; this.project = undefined; }),
-      switchMap(params => this.projectsService.bySlug(params.get('slug') ?? '')),
+      switchMap(params => this.projectsService.bySlug(params.get('slug') ?? '').pipe(timeout({ first: 10000 }))),
     ).subscribe({
       next: project => {
         this.loading = false;
