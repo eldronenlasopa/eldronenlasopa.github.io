@@ -1,9 +1,6 @@
 import { Component, DestroyRef, inject, output, signal } from '@angular/core';
 
-interface BootLine {
-  cmd: string;
-  out: string | null;
-}
+interface BootLine { cmd: string; out: string | null; }
 
 const BOOT_LINES: BootLine[] = [
   { cmd: '$ init dronlab.system', out: null },
@@ -13,7 +10,6 @@ const BOOT_LINES: BootLine[] = [
   { cmd: '> desplegando dron', out: 'listo' },
 ];
 
-/** Boot-sequence splash screen. Loops a typewriter terminal log for the showcase. */
 @Component({
   selector: 'app-loader',
   templateUrl: './loader.html',
@@ -37,83 +33,63 @@ export class Loader {
       this.intervals.forEach(clearInterval);
       this.timeouts.forEach(clearTimeout);
     });
-    this.runLoop();
-  }
-
-  private async runLoop(): Promise<void> {
-    while (!this.stopped) {
-      await this.playOnce();
-      if (this.stopped) return;
-      await this.wait(1600);
-      this.typed.set('');
-      this.doneLines.set([]);
-      this.currentLine.set(BOOT_LINES[0]);
-      this.progress.set(0);
-      this.finished.set(false);
-    }
+    this.playOnce();
   }
 
   private async playOnce(): Promise<void> {
+    const startedAt = performance.now();
     for (const line of BOOT_LINES) {
       if (this.stopped) return;
       this.currentLine.set(line);
       await this.typeLine(line.cmd);
-      if (this.stopped) return;
-      await this.wait(220);
-      this.doneLines.update((d) => [...d, line]);
+      await this.wait(30);
+      this.doneLines.update(lines => [...lines, line]);
       this.rampProgress(Math.round((this.doneLines().length / BOOT_LINES.length) * 100));
     }
+
     this.currentLine.set(null);
     await this.waitForProgress();
+    const remaining = Math.max(0, 1000 - (performance.now() - startedAt));
+    await this.wait(remaining);
     if (this.stopped) return;
-    await this.wait(700);
     this.finished.set(true);
-    await this.wait(360);
+    await this.wait(140);
     if (!this.stopped) this.completed.emit();
   }
 
   private typeLine(full: string): Promise<void> {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       this.typed.set('');
-      let i = 0;
+      let index = 0;
       const id = setInterval(() => {
-        i += 1;
-        this.typed.set(full.slice(0, i));
-        if (i >= full.length) {
-          clearInterval(id);
-          resolve();
-        }
-      }, 34);
+        index += 1;
+        this.typed.set(full.slice(0, index));
+        if (index >= full.length) { clearInterval(id); resolve(); }
+      }, 8);
       this.intervals.push(id);
     });
   }
 
   private rampProgress(target: number): void {
     const id = setInterval(() => {
-      const p = this.progress();
-      if (p >= target) {
-        clearInterval(id);
-        return;
-      }
-      this.progress.set(Math.min(target, p + 2));
-    }, 16);
+      const current = this.progress();
+      if (current >= target) { clearInterval(id); return; }
+      this.progress.set(Math.min(target, current + 10));
+    }, 8);
     this.intervals.push(id);
   }
 
   private waitForProgress(): Promise<void> {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       const id = setInterval(() => {
-        if (this.progress() >= 100) {
-          clearInterval(id);
-          resolve();
-        }
-      }, 20);
+        if (this.progress() >= 100) { clearInterval(id); resolve(); }
+      }, 16);
       this.intervals.push(id);
     });
   }
 
   private wait(ms: number): Promise<void> {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       const id = setTimeout(resolve, ms);
       this.timeouts.push(id);
     });
