@@ -1,11 +1,11 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Badge } from '../../../ui/data-display/badge/badge';
 import { Tag } from '../../../ui/data-display/tag/tag';
 import { Button } from '../../../ui/actions/button/button';
 import { Wordmark } from '../../../ui/brand/wordmark/wordmark';
 import { WhatsAppFab } from '../../../ui/marketing/whatsapp-fab/whatsapp-fab';
-import { PROJECTS } from '../../../core/projects-data';
+import { ProjectsService } from '../../../core/projects.service';
 
 const FILTERS = ['Todos', 'Web', 'Landing', 'Automatización', 'Integración'];
 const PAGE_SIZE = 6;
@@ -21,12 +21,14 @@ const STATS: [string, string][] = [
   imports: [Badge, Tag, Button, Wordmark, WhatsAppFab],
   templateUrl: './project-list.html',
 })
-export class ProjectList {
+export class ProjectList implements OnInit {
   private readonly router = inject(Router);
+  private readonly projectsService = inject(ProjectsService);
 
   readonly filters = FILTERS;
   readonly stats = STATS;
-  readonly projects = PROJECTS;
+  readonly projects = signal<import('../../../core/projects-data').Project[]>([]);
+  ngOnInit(): void { this.projectsService.list().subscribe(items => this.projects.set(items)); }
 
   readonly filter = signal('Todos');
   readonly query = signal('');
@@ -35,7 +37,7 @@ export class ProjectList {
   readonly filtered = computed(() => {
     const f = this.filter();
     const q = this.query().trim().toLowerCase();
-    return this.projects.filter((p) => {
+    return this.projects().filter((p) => {
       const okCat = f === 'Todos' || p.cat === f;
       const okQ = !q || (p.title + ' ' + p.client + ' ' + p.tags.join(' ')).toLowerCase().includes(q);
       return okCat && okQ;
@@ -51,7 +53,7 @@ export class ProjectList {
   readonly pages = computed(() => Array.from({ length: this.pageCount() }, (_, i) => i + 1));
 
   filterCount(f: string): number {
-    return f === 'Todos' ? this.projects.length : this.projects.filter((p) => p.cat === f).length;
+    return f === 'Todos' ? this.projects().length : this.projects().filter((p) => p.cat === f).length;
   }
 
   setFilter(f: string): void {

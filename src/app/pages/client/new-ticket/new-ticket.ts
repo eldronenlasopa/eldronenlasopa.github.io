@@ -35,8 +35,7 @@ export class NewTicket {
       title: this.title(),
       priority: this.priority(),
       description: this.description(),
-    });
-    this.router.navigateByUrl('/panel-cliente');
+    }).subscribe({ next: () => this.router.navigateByUrl('/panel-cliente') });
   }
 
   onCancel(): void {

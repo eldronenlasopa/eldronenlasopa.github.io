@@ -1,4 +1,5 @@
-import { Component, computed, signal } from '@angular/core';
+import { Component, computed, inject, signal, OnInit } from '@angular/core';
+import { ApiService } from '../../../core/api.service';
 
 interface Review {
   quote: string;
@@ -59,12 +60,14 @@ const STARS = [0, 1, 2, 3, 4];
   selector: 'app-reviews-section',
   templateUrl: './reviews-section.html',
 })
-export class ReviewsSection {
-  readonly reviews = REVIEWS;
+export class ReviewsSection implements OnInit {
+  private readonly api = inject(ApiService);
+  readonly reviews = signal<Review[]>([]);
   readonly stars = STARS;
 
   readonly active = signal(0);
-  readonly activeReview = computed(() => this.reviews[this.active()]);
+  readonly activeReview = computed(() => this.reviews()[this.active()] ?? REVIEWS[0]);
+  ngOnInit(): void { this.api.reviews().subscribe(items => this.reviews.set(items.map(item => ({ quote: item.body, name: item.authorName, role: 'Cliente', company: item.companyName ?? '', initials: item.authorName.split(' ').map(part => part[0]).join('').slice(0, 2).toUpperCase(), rating: item.rating, color: '#22D3EE' })))); }
 
   select(index: number): void {
     this.active.set(index);

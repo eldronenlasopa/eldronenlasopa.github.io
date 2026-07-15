@@ -26,8 +26,9 @@ export class Login {
   ) {}
 
   onSubmit(): void {
-    const user = this.auth.login(this.email());
-    const redirectTo = this.route.snapshot.queryParamMap.get('redirectTo');
-    this.router.navigateByUrl(redirectTo ? '/' + redirectTo : HOME_BY_ROLE[user.role]);
+    this.auth.login(this.email(), this.password()).subscribe({
+      next: user => { const redirectTo = this.route.snapshot.queryParamMap.get('redirectTo'); this.router.navigateByUrl(redirectTo ? '/' + redirectTo : HOME_BY_ROLE[user.role]); },
+      error: () => window.alert('No pudimos iniciar sesión. Revisa tus credenciales.'),
+    });
   }
 }

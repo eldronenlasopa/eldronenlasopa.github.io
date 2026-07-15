@@ -1,4 +1,5 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal, OnInit } from '@angular/core';
+import { ProjectsService } from '../../core/projects.service';
 import { Router } from '@angular/router';
 import { Card } from '../../ui/data-display/card/card';
 import { Badge, type BadgeTone } from '../../ui/data-display/badge/badge';
@@ -56,13 +57,14 @@ const ACTIVITY: ActivityItem[] = [
   imports: [Card, Badge, Button, Tag, IconButton, Wordmark],
   templateUrl: './client-dashboard.html',
 })
-export class ClientDashboard {
+export class ClientDashboard implements OnInit {
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
   private readonly ticketsService = inject(TicketsService);
+  private readonly projectsService = inject(ProjectsService);
 
   readonly nav = NAV;
-  readonly projects = PROJECTS;
+  readonly projects = signal<ProjectItem[]>([]);
   readonly tickets = this.ticketsService.tickets;
   readonly activity = ACTIVITY;
 
@@ -70,6 +72,7 @@ export class ClientDashboard {
 
   readonly active = signal('resumen');
   readonly activeLabel = computed(() => this.nav.find((n) => n.id === this.active())?.label ?? '');
+  ngOnInit(): void { this.projectsService.clientList().subscribe(items => this.projects.set(items.map(p => ({ slug: p.slug, name: p.title, progress: Number(p.results[0][0].replace('%','')) || 0, status: [p.results[0][1], 'warning'], stack: p.tags } as ProjectItem)))); this.ticketsService.load(); }
 
   navClasses(id: string): string {
     const on = id === this.active();

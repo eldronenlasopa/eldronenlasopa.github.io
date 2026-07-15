@@ -24,7 +24,7 @@
       </div>
 
       <div class="flex flex-wrap gap-3">
-        @for (review of reviews; track review.name; let i = $index) {
+        @for (review of reviews(); track review.name; let i = $index) {
           <button
             type="button"
             [attr.title]="review.name"

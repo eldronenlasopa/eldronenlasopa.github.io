@@ -1,0 +1,18 @@
+<!-- @dsCard group="Colors" viewport="700x160" name="Semantic status" subtitle="Success, warning, danger, info — con sus tints" -->
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8"><link rel="stylesheet" href="../styles.css">
+<style>
+  body{margin:0;font-family:var(--font-body);background:var(--surface-card)}
+  .row{display:flex;gap:14px;padding:22px}
+  .item{flex:1;border-radius:var(--radius-md);overflow:hidden;border:1px solid var(--border-subtle)}
+  .solid{height:56px;display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);font-size:12px;font-weight:600;color:#fff}
+  .tint{height:34px;display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);font-size:10px}
+</style></head>
+<body>
+<div class="row">
+  <div class="item"><div class="solid" style="background:var(--success)">success</div><div class="tint" style="background:var(--success-tint);color:var(--success)">tint</div></div>
+  <div class="item"><div class="solid" style="background:var(--warning);color:#0B0F1A">warning</div><div class="tint" style="background:var(--warning-tint);color:var(--brand-yellow-600)">tint</div></div>
+  <div class="item"><div class="solid" style="background:var(--danger)">danger</div><div class="tint" style="background:var(--danger-tint);color:var(--danger)">tint</div></div>
+  <div class="item"><div class="solid" style="background:var(--info)">info</div><div class="tint" style="background:var(--info-tint);color:var(--info)">tint</div></div>
+</div>
+</body></html>

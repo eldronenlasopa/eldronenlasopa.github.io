@@ -1,18 +1,16 @@
-import { Injectable, computed, signal } from '@angular/core';
+import { Injectable, computed, inject, signal } from '@angular/core';
+import { Observable, map, tap } from 'rxjs';
+import { ApiService } from './api.service';
 
 export type UserRole = 'client' | 'admin';
 
 export interface AuthUser {
+  id?: string;
   name: string;
   email: string;
   role: UserRole;
   initials: string;
 }
-
-const MOCK_USERS: Record<string, AuthUser> = {
-  'cliente@dronlab.pe': { name: 'Comercial Andina', email: 'cliente@dronlab.pe', role: 'client', initials: 'CA' },
-  'admin@dronlab.pe': { name: 'Equipo DronLab', email: 'admin@dronlab.pe', role: 'admin', initials: 'DL' },
-};
 
 const STORAGE_KEY = 'dronlab_session';
 
@@ -33,25 +31,32 @@ function readStoredUser(): AuthUser | null {
  */
 @Injectable({ providedIn: 'root' })
 export class AuthService {
+  private readonly api = inject(ApiService);
   private readonly user = signal<AuthUser | null>(readStoredUser());
 
   readonly currentUser = this.user.asReadonly();
   readonly isAuthenticated = computed(() => this.user() !== null);
 
-  login(email: string): AuthUser {
-    const resolved = MOCK_USERS[email.toLowerCase().trim()] ?? {
-      name: email.split('@')[0] || 'Cliente',
-      email,
-      role: 'client' as const,
-      initials: (email[0] ?? 'C').toUpperCase(),
-    };
-    this.user.set(resolved);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(resolved));
-    return resolved;
+  login(email: string, password: string): Observable<AuthUser> {
+    return this.api.login(email, password).pipe(
+      tap(response => localStorage.setItem('dronlab_token', response.token)),
+      map(response => ({
+        id: response.id,
+        name: response.name,
+        email: response.email,
+        role: response.role as UserRole,
+        initials: response.name.split(' ').map(part => part[0]).join('').slice(0, 2).toUpperCase(),
+      })),
+      tap(resolved => {
+        this.user.set(resolved);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(resolved));
+      }),
+    );
   }
 
   logout(): void {
     this.user.set(null);
     localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem('dronlab_token');
   }
 }
