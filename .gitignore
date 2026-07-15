@@ -31,7 +31,9 @@ yarn-error.log
 
 # Miscellaneous
 /.claude
-/.angular/cache
+/.angular
+/app-eldronenlasopa-web
+/dist
 .sass-cache/
 /connect.lock
 /coverage
