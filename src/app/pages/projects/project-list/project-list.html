@@ -82,7 +82,9 @@
       <div class="grid grid-cols-[repeat(auto-fill,minmax(min(100%,300px),1fr))] gap-6">
         @for (p of shown(); track p.slug) {
           <article
-            (click)="openProject(p.slug)"
+            [routerLink]="['/proyectos', p.slug]"
+            [attr.aria-label]="'Ver detalle de ' + p.title"
+            tabindex="0"
             class="group relative cursor-pointer overflow-hidden rounded-lg border border-border-subtle bg-surface-card shadow-xs transition-shadow duration-200 ease-out hover:shadow-lg"
           >
             <div class="relative flex h-[132px] items-center justify-center overflow-hidden bg-[image:var(--gradient-ink)]">

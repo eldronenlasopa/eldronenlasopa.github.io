@@ -1,5 +1,6 @@
 import { Component, computed, inject, signal, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { Badge } from '../../../ui/data-display/badge/badge';
 import { Tag } from '../../../ui/data-display/tag/tag';
 import { Button } from '../../../ui/actions/button/button';
@@ -18,7 +19,7 @@ const STATS: [string, string][] = [
 /** Public project gallery: category filters, search by name/client/tech and pagination. */
 @Component({
   selector: 'app-project-list',
-  imports: [Badge, Tag, Button, Wordmark, WhatsAppFab],
+  imports: [Badge, Tag, Button, Wordmark, WhatsAppFab, RouterLink],
   templateUrl: './project-list.html',
 })
 export class ProjectList implements OnInit {
