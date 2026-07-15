@@ -1,6 +1,6 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { switchMap } from 'rxjs';
+import { switchMap, tap } from 'rxjs';
 import { Badge } from '../../../ui/data-display/badge/badge';
 import { Button } from '../../../ui/actions/button/button';
 import { Wordmark } from '../../../ui/brand/wordmark/wordmark';
@@ -20,14 +20,18 @@ export class ProjectDetail implements OnInit {
   private readonly projectsService = inject(ProjectsService);
 
   project: Project | undefined;
+  loading = true;
+  notFound = false;
   related: Project[] = [];
   metaRows: [string, string][] = [];
 
   ngOnInit(): void {
     this.route.paramMap.pipe(
+      tap(() => { this.loading = true; this.notFound = false; this.project = undefined; }),
       switchMap(params => this.projectsService.bySlug(params.get('slug') ?? '')),
     ).subscribe({
       next: project => {
+        this.loading = false;
         this.project = project;
         this.metaRows = [
           ['Cliente', project.client],
@@ -37,6 +41,8 @@ export class ProjectDetail implements OnInit {
         ];
       },
       error: () => {
+        this.loading = false;
+        this.notFound = true;
         this.project = undefined;
         this.metaRows = [];
       },

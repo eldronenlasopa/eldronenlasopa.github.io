@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { catchError, map, Observable, of, switchMap, throwError } from 'rxjs';
+import { map, Observable } from 'rxjs';
 import { ApiService } from './api.service';
 import type { ApiProject } from './models/api.models';
 import { Project } from './projects-data';
@@ -21,12 +21,6 @@ export class ProjectsService {
   list(): Observable<Project[]> { return this.api.projects().pipe(map(items => items.map(toProject))); }
   clientList(): Observable<Project[]> { return this.api.clientProjects().pipe(map(items => items.map(toProject))); }
   bySlug(slug: string): Observable<Project> {
-    return this.api.project(slug).pipe(
-      map(toProject),
-      catchError(() => this.api.projects().pipe(
-        map(items => items.find(item => item.slug === slug)),
-        switchMap(item => item ? of(toProject(item)) : throwError(() => new Error('Proyecto no encontrado.'))),
-      )),
-    );
+    return this.api.project(slug).pipe(map(toProject));
   }
 }
