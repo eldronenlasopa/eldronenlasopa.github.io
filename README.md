@@ -36,6 +36,14 @@ ng build
 
 This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
 
+## GitHub Pages
+
+Every push to `main` runs [`.github/workflows/deploy-pages.yml`](.github/workflows/deploy-pages.yml) and publishes the production build through GitHub Pages.
+
+The `postbuild` script generates `404.html` from Angular's compiled `index.html`, so refreshing routes such as `/proyectos`, `/login` or `/panel-cliente` keeps the SPA working. It also creates `.nojekyll` and adds a build identifier.
+
+For the first deployment, set the repository's Pages source to **GitHub Actions** in **Settings → Pages**. Production assets use Angular's `outputHashing: all`, so each build receives new bundle filenames and does not depend on manually clearing the browser cache.
+
 ## Running unit tests
 
 To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
