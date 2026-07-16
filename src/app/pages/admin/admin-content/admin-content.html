@@ -13,7 +13,7 @@
         <app-wordmark tone="light" size="sm" />
         <div class="flex flex-wrap gap-2">
           <app-button variant="ghost-inverse" size="sm" (clicked)="goToSite()">Ver web</app-button>
-          <app-button variant="ghost-inverse" size="sm" (clicked)="resetContent()">Restaurar base</app-button>
+          <app-button variant="ghost-inverse" size="sm" [disabled]="saving()" (clicked)="resetContent()">Recargar datos</app-button>
           <app-button variant="inverse" size="sm" (clicked)="goToPanel()">← Panel admin</app-button>
         </div>
       </div>
@@ -61,7 +61,7 @@
           <app-input label="Texto del botón (CTA)" [value]="headerCta()" (valueChange)="headerCta.set($event)" />
         </div>
         <div class="mt-6 flex justify-end">
-          <app-button variant="primary" (clicked)="saveHeader()">Guardar header</app-button>
+          <app-button variant="primary" [disabled]="saving()" (clicked)="saveHeader()">{{ saving() ? 'Guardando...' : 'Guardar header' }}</app-button>
         </div>
       </app-card>
     } @else if (tab() === 'footer') {
@@ -95,7 +95,7 @@
           <app-button variant="outline" size="sm" (clicked)="addFooterColumn()"><span slot="icon-left">+</span>Añadir columna</app-button>
         </div>
         <div class="mt-6 flex justify-end border-t border-border-subtle pt-5">
-          <app-button variant="primary" (clicked)="saveFooter()">Guardar footer</app-button>
+          <app-button variant="primary" [disabled]="saving()" (clicked)="saveFooter()">{{ saving() ? 'Guardando...' : 'Guardar footer' }}</app-button>
         </div>
       </app-card>
     } @else if (currentEntity(); as def) {
@@ -233,8 +233,8 @@
             }
           </div>
           <div class="mt-6 flex justify-end gap-3 border-t border-border-subtle pt-5">
-            <app-button variant="primary" (clicked)="save()"
-              >{{ isNew() ? 'Crear' : 'Guardar cambios' }}<span slot="icon-right">→</span></app-button
+            <app-button variant="primary" [disabled]="saving()" (clicked)="save()"
+              >{{ saving() ? 'Guardando...' : isNew() ? 'Crear' : 'Guardar cambios' }}<span slot="icon-right">→</span></app-button
             >
           </div>
         </app-card>

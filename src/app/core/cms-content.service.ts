@@ -1,16 +1,22 @@
-import { isPlatformBrowser } from '@angular/common';
-import { Injectable, PLATFORM_ID, computed, effect, inject, signal } from '@angular/core';
+import { Injectable, computed, inject, signal } from '@angular/core';
+import { Observable, forkJoin, map, switchMap, tap } from 'rxjs';
+import { ApiService } from './api.service';
+import type { ApiCms, ApiCompany, ApiPlan, ApiProject, ApiReview, ApiServiceItem, ApiSiteContent } from './models/api.models';
 
 export interface CmsCompany {
+  id?: string;
   name: string;
   sector: string;
   result: string;
   logo: string;
   glyph: string;
   color: string;
+  isPublished?: string;
+  displayOrder?: string;
 }
 
 export interface CmsReview {
+  id?: string;
   name: string;
   role: string;
   company: string;
@@ -18,17 +24,24 @@ export interface CmsReview {
   rating: string;
   photo: string;
   color: string;
+  status?: string;
+  displayOrder?: string;
 }
 
 export interface CmsServiceItem {
+  id?: string;
   title: string;
   body: string;
   image: string;
   glyph: string;
   color: string;
+  isPublished?: string;
+  displayOrder?: string;
 }
 
 export interface CmsProjectItem {
+  id?: string;
+  slug?: string;
   title: string;
   client: string;
   cat: string;
@@ -39,9 +52,15 @@ export interface CmsProjectItem {
   challenge: string;
   solution: string;
   color: string;
+  progress?: string;
+  status?: string;
+  tags?: string;
+  isPublished?: string;
+  displayOrder?: string;
 }
 
 export interface CmsPlan {
+  id?: string;
   name: string;
   price: string;
   description: string;
@@ -49,6 +68,8 @@ export interface CmsPlan {
   featured: string;
   cta: string;
   image: string;
+  isPublished?: string;
+  displayOrder?: string;
 }
 
 export type CmsSectionId = 'hero' | 'clients' | 'services' | 'pricing' | 'reviews' | 'contact';
@@ -92,8 +113,6 @@ export interface CmsContentState {
     columns: CmsFooterColumn[];
   };
 }
-
-const STORAGE_KEY = 'dronlab.cmsContent.v1';
 
 const DEFAULT_STATE: CmsContentState = {
   companies: [
@@ -291,11 +310,66 @@ function cloneState(): CmsContentState {
   return structuredClone(DEFAULT_STATE);
 }
 
+export type CmsCollectionKey = 'companies' | 'reviews' | 'services' | 'projects' | 'plans' | 'sections';
+export type CmsEntityItem = Record<string, string>;
+
+function text(value: string | null | undefined): string {
+  return value ?? '';
+}
+
+function slugify(value: string): string {
+  return value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+}
+
+function toCompany(item: ApiCompany): CmsCompany {
+  return { id: item.id, name: item.name, sector: text(item.sector), result: text(item.result), logo: text(item.logoUrl), glyph: text(item.glyph) || '◧', color: text(item.accentColor) || '#FF6B35', isPublished: String(item.isPublished), displayOrder: String(item.displayOrder) };
+}
+
+function toReview(item: ApiReview): CmsReview {
+  return { id: item.id, name: item.authorName, role: text(item.role), company: text(item.companyName), quote: item.body, rating: String(item.rating), photo: text(item.photoUrl), color: text(item.accentColor) || '#FF6B35', status: String(item.status), displayOrder: String(item.displayOrder) };
+}
+
+function toService(item: ApiServiceItem): CmsServiceItem {
+  return { id: item.id, title: item.title, body: item.body, image: '', glyph: text(item.glyph) || '◆', color: text(item.accentColor) || '#FF6B35', isPublished: String(item.isPublished), displayOrder: String(item.displayOrder) };
+}
+
+function toProject(item: ApiProject): CmsProjectItem {
+  return { id: item.id, slug: item.slug, title: item.title, client: item.clientName, cat: item.category, year: String(item.year), metric: text(item.metric), logo: text(item.imageUrl), summary: item.description, challenge: text(item.challenge), solution: text(item.solution), color: text(item.accentColor) || '#FF6B35', progress: String(item.progress), status: item.status, tags: (item.tags ?? []).join('\n'), isPublished: String(item.isPublished ?? true), displayOrder: String(item.displayOrder ?? 0) };
+}
+
+function toPlan(item: ApiPlan): CmsPlan {
+  return { id: item.id, name: item.name, price: item.price, description: item.description, features: (item.features ?? []).join('\n'), featured: item.isFeatured ? 'Sí' : 'No', cta: item.cta, image: '', isPublished: String(item.isPublished), displayOrder: String(item.displayOrder) };
+}
+
+function stateFromApi(cms: ApiCms, content: ApiSiteContent[]): CmsContentState {
+  const defaults = cloneState();
+  return {
+    companies: (cms.companies ?? []).map(toCompany),
+    reviews: (cms.reviews ?? []).map(toReview),
+    services: (cms.services ?? []).map(toService),
+    projects: (cms.projects ?? []).map(toProject),
+    plans: (cms.plans ?? []).map(toPlan),
+    sections: defaults.sections.map((section) => {
+      const stored = content.find((item) => item.key === `home.${section.id}`);
+      return stored ? { ...section, title: stored.title || section.title, description: stored.body || section.description, image: text(stored.imageUrl) } : section;
+    }),
+    header: {
+      cta: cms.header?.cta || defaults.header.cta,
+      links: (cms.header?.links ?? defaults.header.links).map((link) => ({ ...link })),
+    },
+    footer: {
+      about: cms.footer?.about || defaults.footer.about,
+      email: cms.footer?.email || defaults.footer.email,
+      phone: cms.footer?.phone || defaults.footer.phone,
+      columns: (cms.footer?.columns ?? []).map((column) => ({ title: column.title, links: (column.links ?? []).join('\n') })),
+    },
+  };
+}
+
 @Injectable({ providedIn: 'root' })
 export class CmsContentService {
-  private readonly platformId = inject(PLATFORM_ID);
-  private readonly isBrowser = isPlatformBrowser(this.platformId);
-  private readonly state = signal<CmsContentState>(this.loadInitialState());
+  private readonly api = inject(ApiService);
+  private readonly state = signal<CmsContentState>({ ...cloneState(), companies: [], reviews: [], services: [], projects: [], plans: [] });
 
   readonly companies = computed(() => this.state().companies);
   readonly reviews = computed(() => this.state().reviews);
@@ -307,60 +381,75 @@ export class CmsContentService {
   readonly footer = computed(() => this.state().footer);
 
   constructor() {
-    effect(() => {
-      if (!this.isBrowser) return;
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(this.state()));
-      } catch {
-        // The temporary browser store can fill up when several large images are used.
-      }
-    });
+    this.load(false).subscribe({ error: () => undefined });
   }
 
-  setCollection<K extends 'companies' | 'reviews' | 'services' | 'projects' | 'plans' | 'sections'>(key: K, value: CmsContentState[K]): void {
-    this.state.update((current) => ({ ...current, [key]: [...value] }));
+  load(includeUnpublished: boolean): Observable<CmsContentState> {
+    return forkJoin({ cms: this.api.cms(includeUnpublished), content: this.api.siteContent(includeUnpublished) }).pipe(
+      map(({ cms, content }) => stateFromApi(cms, content)),
+      tap((state) => this.state.set(state)),
+    );
   }
 
   section(id: CmsSectionId) {
     return computed(() => this.state().sections.find((section) => section.id === id) ?? DEFAULT_STATE.sections.find((section) => section.id === id)!);
   }
 
-  setHeader(value: CmsContentState['header']): void {
-    this.state.update((current) => ({
-      ...current,
-      header: {
-        cta: value.cta,
-        links: value.links.map((link) => ({ ...link })),
-      },
-    }));
-  }
-
-  setFooter(value: CmsContentState['footer']): void {
-    this.state.update((current) => ({
-      ...current,
-      footer: {
-        about: value.about,
-        email: value.email,
-        phone: value.phone,
-        columns: value.columns.map((column) => ({ ...column })),
-      },
-    }));
-  }
-
-  reset(): void {
-    this.state.set(cloneState());
-  }
-
-  private loadInitialState(): CmsContentState {
-    if (!this.isBrowser) return cloneState();
-
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (!stored) return cloneState();
-
-    try {
-      return { ...cloneState(), ...JSON.parse(stored) };
-    } catch {
-      return cloneState();
+  saveCollection(key: CmsCollectionKey, item: CmsEntityItem, isNew: boolean, displayOrder: number): Observable<CmsContentState> {
+    let request$: Observable<unknown>;
+    const id = item['id'];
+    switch (key) {
+      case 'companies': {
+        const input = { name: item['name'], sector: item['sector'], description: '', result: item['result'], logoUrl: item['logo'] || null, websiteUrl: null, glyph: item['glyph'], accentColor: item['color'], isPublished: item['isPublished'] !== 'false', displayOrder };
+        request$ = isNew ? this.api.createCompany(input) : this.api.updateCompany(id, input);
+        break;
+      }
+      case 'reviews': {
+        const input = { authorName: item['name'], role: item['role'], companyName: item['company'], body: item['quote'], rating: Number(item['rating']) || 5, photoUrl: item['photo'] || null, accentColor: item['color'], status: Number(item['status'] ?? 1), displayOrder };
+        request$ = isNew ? this.api.createReview(input) : this.api.updateReview(id, input);
+        break;
+      }
+      case 'services': {
+        const input = { title: item['title'], body: item['body'], glyph: item['glyph'], accentColor: item['color'], isPublished: item['isPublished'] !== 'false', displayOrder };
+        request$ = isNew ? this.api.createService(input) : this.api.updateService(id, input);
+        break;
+      }
+      case 'projects': {
+        const input = { slug: item['slug'] || slugify(`${item['client']}-${item['title']}`), title: item['title'], clientName: item['client'], category: item['cat'], year: Number(item['year']) || new Date().getFullYear(), progress: Number(item['progress']) || 0, status: item['status'] || 'En desarrollo', description: item['summary'], metric: item['metric'], imageUrl: item['logo'] || null, challenge: item['challenge'], solution: item['solution'], accentColor: item['color'], tags: (item['tags'] || '').split('\n').map((tag) => tag.trim()).filter(Boolean), isPublished: item['isPublished'] !== 'false', displayOrder };
+        request$ = isNew ? this.api.createProject(input) : this.api.updateProject(id, input);
+        break;
+      }
+      case 'plans': {
+        const input = { name: item['name'], price: item['price'], description: item['description'], features: (item['features'] || '').split('\n').map((feature) => feature.trim()).filter(Boolean), isFeatured: item['featured'] === 'Sí', cta: item['cta'], isPublished: item['isPublished'] !== 'false', displayOrder };
+        request$ = isNew ? this.api.createPlan(input) : this.api.updatePlan(id, input);
+        break;
+      }
+      case 'sections': {
+        const contentKey = `home.${item['id']}`;
+        request$ = this.api.updateSiteContent(contentKey, { key: contentKey, title: item['title'], body: item['description'], imageUrl: item['image'] || null, status: 1 });
+        break;
+      }
     }
+    return request$.pipe(switchMap(() => this.load(true)));
+  }
+
+  deleteCollection(key: Exclude<CmsCollectionKey, 'sections'>, id: string): Observable<CmsContentState> {
+    const requests: Record<Exclude<CmsCollectionKey, 'sections'>, () => Observable<unknown>> = {
+      companies: () => this.api.deleteCompany(id),
+      reviews: () => this.api.deleteReview(id),
+      services: () => this.api.deleteService(id),
+      projects: () => this.api.deleteProject(id),
+      plans: () => this.api.deletePlan(id),
+    };
+    return requests[key]().pipe(switchMap(() => this.load(true)));
+  }
+
+  saveHeader(value: CmsContentState['header']): Observable<CmsContentState> {
+    return this.api.updateHeader(value).pipe(switchMap(() => this.load(true)));
+  }
+
+  saveFooter(value: CmsContentState['footer']): Observable<CmsContentState> {
+    const input = { ...value, columns: value.columns.map((column) => ({ title: column.title, links: column.links.split('\n').map((link) => link.trim()).filter(Boolean) })) };
+    return this.api.updateFooter(input).pipe(switchMap(() => this.load(true)));
   }
 }

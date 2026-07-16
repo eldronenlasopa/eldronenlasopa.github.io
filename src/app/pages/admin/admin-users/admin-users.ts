@@ -4,7 +4,6 @@ import { Card } from '../../../ui/data-display/card/card';
 import { Badge } from '../../../ui/data-display/badge/badge';
 import { Button } from '../../../ui/actions/button/button';
 import { Input } from '../../../ui/forms/input/input';
-import { Select, type SelectOption } from '../../../ui/forms/select/select';
 import { Wordmark } from '../../../ui/brand/wordmark/wordmark';
 import { ToastService } from '../../../core/services/toast.service';
 import { DialogService } from '../../../core/services/dialog.service';
@@ -14,29 +13,21 @@ import {
   AdminUserInput,
   AdminUserRole,
   ROLE_META,
-  STATUS_TONE,
-  STATUS_LABEL,
 } from '../../../core/users.service';
 
 const ROLES: AdminUserRole[] = ['admin', 'client'];
-
-const STATUS_OPTIONS: SelectOption[] = [
-  { value: 'Active', label: 'Activo' },
-  { value: 'Invited', label: 'Invitado' },
-  { value: 'Suspended', label: 'Suspendido' },
-];
 
 interface EditingState {
   id: string | null;
   draft: AdminUserInput;
 }
 
-const BLANK_DRAFT: AdminUserInput = { name: '', email: '', role: 'client', company: '', status: 'Invited', sendInvite: true };
+const BLANK_DRAFT: AdminUserInput = { name: '', email: '', role: 'client', password: '' };
 
 /** Gestión de usuarios y roles — no es una entrada del switch interno del panel, se navega como ruta aparte. */
 @Component({
   selector: 'app-admin-users',
-  imports: [Card, Badge, Button, Input, Select, Wordmark],
+  imports: [Card, Badge, Button, Input, Wordmark],
   templateUrl: './admin-users.html',
   styleUrl: './admin-users.css',
 })
@@ -48,9 +39,6 @@ export class AdminUsers implements OnInit {
 
   readonly roles = ROLES;
   readonly roleMeta = ROLE_META;
-  readonly statusTone = STATUS_TONE;
-  readonly statusLabel = STATUS_LABEL;
-  readonly statusOptions = STATUS_OPTIONS;
 
   readonly users = this.usersService.users;
   readonly filter = signal<'todos' | AdminUserRole>('todos');
@@ -71,13 +59,15 @@ export class AdminUsers implements OnInit {
     const q = this.query().trim().toLowerCase();
     return this.users().filter((u) => {
       const okRole = f === 'todos' || u.role === f;
-      const okQ = !q || `${u.name} ${u.email} ${u.company}`.toLowerCase().includes(q);
+      const okQ = !q || `${u.name} ${u.email}`.toLowerCase().includes(q);
       return okRole && okQ;
     });
   });
 
   ngOnInit(): void {
-    this.usersService.load();
+    this.usersService.load().subscribe({
+      error: () => this.toast.error('No pudimos cargar los usuarios', 'Verifica tu sesión y la conexión con el backend.'),
+    });
   }
 
   @HostListener('document:keydown.escape')
@@ -97,12 +87,16 @@ export class AdminUsers implements OnInit {
     return name.split(' ').slice(0, 2).map((w) => w[0]).join('').toUpperCase();
   }
 
+  isInactive(id: string | null): boolean {
+    return id !== null && this.users().find((user) => user.id === id)?.isActive === false;
+  }
+
   openNew(): void {
     this.editing.set({ id: null, draft: { ...BLANK_DRAFT } });
   }
 
   openEdit(u: AdminUser): void {
-    this.editing.set({ id: u.id, draft: { name: u.name, email: u.email, role: u.role, company: u.company, status: u.status, sendInvite: true } });
+    this.editing.set({ id: u.id, draft: { name: u.name, email: u.email, role: u.role, password: '' } });
   }
 
   closeDrawer(): void {
@@ -120,7 +114,7 @@ export class AdminUsers implements OnInit {
 
   draftValid(): boolean {
     const draft = this.editing()?.draft;
-    return !!draft && draft.name.trim().length > 0 && /.+@.+\..+/.test(draft.email);
+    return !!draft && draft.name.trim().length > 0 && /.+@.+\..+/.test(draft.email) && (!this.isNew() || draft.password.length >= 8);
   }
 
   save(): void {
@@ -161,6 +155,23 @@ export class AdminUsers implements OnInit {
         this.toast.success('Usuario eliminado', `"${name}" perdió el acceso.`);
       },
       error: () => this.toast.error('No pudimos eliminar el usuario', 'Inténtalo nuevamente en unos momentos.'),
+    });
+  }
+
+  activateFromDrawer(): void {
+    const e = this.editing();
+    if (!e?.id || this.saving()) return;
+    this.saving.set(true);
+    this.usersService.activate(e.id).subscribe({
+      next: () => {
+        this.saving.set(false);
+        this.editing.set(null);
+        this.toast.success('Usuario activado', 'La cuenta ya puede iniciar sesión.');
+      },
+      error: () => {
+        this.saving.set(false);
+        this.toast.error('No pudimos activar el usuario', 'Inténtalo nuevamente.');
+      },
     });
   }
 

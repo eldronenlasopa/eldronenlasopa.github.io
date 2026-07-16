@@ -67,11 +67,8 @@ const ENTITIES: Record<string, EntityDef> = {
     blank: {},
     fields: [
       { key: 'image', label: 'Imagen de la sección', type: 'image', shape: 'rect', hint: 'JPG, PNG, WebP o SVG. Máximo 1 MB.' },
-      { key: 'eyebrow', label: 'Etiqueta superior', type: 'text', placeholder: 'Qué hacemos' },
       { key: 'title', label: 'Título principal', type: 'text', placeholder: 'Un socio tecnológico' },
-      { key: 'highlight', label: 'Texto destacado', type: 'text', placeholder: 'Opcional' },
       { key: 'description', label: 'Descripción', type: 'textarea', placeholder: 'Texto de apoyo de la sección.' },
-      { key: 'items', label: 'Datos secundarios (uno por línea)', type: 'textarea', placeholder: 'React\nNode.js\nPython' },
     ],
     seed: [],
     rowTitle: (item) => item['name'] || 'Sección',
@@ -132,11 +129,9 @@ const ENTITIES: Record<string, EntityDef> = {
     icon: '◆',
     title: 'Servicios (Qué hacemos)',
     addLabel: 'servicio',
-    imageKey: 'image',
     glyphKey: 'glyph',
-    blank: { title: '', body: '', image: '', glyph: '◆', color: '#FF6B35' },
+    blank: { title: '', body: '', glyph: '◆', color: '#FF6B35' },
     fields: [
-      { key: 'image', label: 'Imagen del servicio', type: 'image', shape: 'rect', hint: 'Captura o fotografía. Máximo 1 MB.' },
       { key: 'glyph', label: 'Ícono', type: 'glyph' },
       { key: 'title', label: 'Título', type: 'text', placeholder: 'Aplicaciones web' },
       { key: 'color', label: 'Color de acento', type: 'color' },
@@ -184,10 +179,8 @@ const ENTITIES: Record<string, EntityDef> = {
     icon: '▦',
     title: 'Planes de precios',
     addLabel: 'plan',
-    imageKey: 'image',
-    blank: { name: '', price: '', description: '', features: '', featured: 'No', cta: 'Empezar', image: '' },
+    blank: { name: '', price: '', description: '', features: '', featured: 'No', cta: 'Empezar' },
     fields: [
-      { key: 'image', label: 'Imagen del plan', type: 'image', shape: 'rect', hint: 'Imagen opcional. Máximo 1 MB.' },
       { key: 'name', label: 'Nombre del plan', type: 'text', placeholder: 'Crece' },
       { key: 'price', label: 'Precio', type: 'text', placeholder: 'S/ 3,500' },
       { key: 'featured', label: 'Destacado', type: 'select', options: ['No', 'Sí'] },
@@ -256,6 +249,7 @@ export class AdminContent {
   readonly sel = signal(0);
   readonly draft = signal<EntityItem>({});
   readonly isNew = computed(() => this.sel() === -1);
+  readonly saving = signal(false);
 
   readonly headerLinks = signal<HeaderLink[]>([...INITIAL_HEADER_LINKS]);
   readonly headerCta = signal(INITIAL_HEADER_CTA);
@@ -268,6 +262,9 @@ export class AdminContent {
   constructor() {
     effect(() => {
       this.loadTab(this.tab());
+    });
+    this.cms.load(true).subscribe({
+      error: () => this.toast.error('No pudimos cargar el CMS', 'Verifica tu sesión y la conexión con el backend.'),
     });
   }
 
@@ -347,17 +344,21 @@ export class AdminContent {
 
   save(): void {
     const def = this.currentEntity();
-    if (!def) return;
+    if (!def || this.saving()) return;
     const value = this.draft();
-    if (this.isNew()) {
-      this.items.update((its) => [...its, value]);
-      this.sel.set(this.items().length - 1);
-    } else {
-      const i = this.sel();
-      this.items.update((its) => its.map((it, idx) => (idx === i ? value : it)));
-    }
-    this.cms.setCollection(def.collectionKey, this.items() as never);
-    this.toast.success('Cambios guardados', `"${def.rowTitle(value)}" se actualizó en la web.`);
+    const isNew = this.isNew();
+    const displayOrder = isNew ? this.items().length + 1 : this.sel() + 1;
+    this.saving.set(true);
+    this.cms.saveCollection(def.collectionKey, value, isNew, displayOrder).subscribe({
+      next: () => {
+        this.saving.set(false);
+        this.toast.success('Cambios guardados', `"${def.rowTitle(value)}" se actualizó en el backend.`);
+      },
+      error: () => {
+        this.saving.set(false);
+        this.toast.error('No pudimos guardar', 'El backend rechazó el cambio. Revisa los campos e inténtalo otra vez.');
+      },
+    });
   }
 
   async deleteItem(): Promise<void> {
@@ -375,11 +376,20 @@ export class AdminContent {
       cancelLabel: 'Cancelar',
     });
     if (!confirmed) return;
-    this.items.update((its) => its.filter((_, idx) => idx !== i));
-    this.cms.setCollection(def.collectionKey, this.items() as never);
-    this.sel.set(0);
-    this.draft.set({ ...(this.items()[0] ?? def.blank) });
-    this.toast.success('Registro eliminado', `"${name}" se quitó de la web.`);
+    const id = item['id'];
+    if (!id || def.collectionKey === 'sections') return;
+    this.saving.set(true);
+    this.cms.deleteCollection(def.collectionKey, id).subscribe({
+      next: () => {
+        this.saving.set(false);
+        this.sel.set(0);
+        this.toast.success('Registro eliminado', `"${name}" se quitó del backend.`);
+      },
+      error: () => {
+        this.saving.set(false);
+        this.toast.error('No pudimos eliminar', 'El backend no pudo completar la operación.');
+      },
+    });
   }
 
   setHeaderLink(i: number, key: keyof HeaderLink, value: string): void {
@@ -395,11 +405,15 @@ export class AdminContent {
   }
 
   saveHeader(): void {
-    this.cms.setHeader({
+    if (this.saving()) return;
+    this.saving.set(true);
+    this.cms.saveHeader({
       links: this.headerLinks().map((link) => ({ ...link })),
       cta: this.headerCta(),
+    }).subscribe({
+      next: () => { this.saving.set(false); this.toast.success('Cambios guardados', 'El header se actualizó en el backend.'); },
+      error: () => { this.saving.set(false); this.toast.error('No pudimos guardar el header', 'Inténtalo nuevamente.'); },
     });
-    this.toast.success('Cambios guardados', '"Header" se actualizó en la web.');
   }
 
   setFooterColumn(i: number, key: keyof FooterColumn, value: string): void {
@@ -415,13 +429,17 @@ export class AdminContent {
   }
 
   saveFooter(): void {
-    this.cms.setFooter({
+    if (this.saving()) return;
+    this.saving.set(true);
+    this.cms.saveFooter({
       about: this.footerAbout(),
       email: this.footerEmail(),
       phone: this.footerPhone(),
       columns: this.footerColumns().map((column) => ({ ...column })),
+    }).subscribe({
+      next: () => { this.saving.set(false); this.toast.success('Cambios guardados', 'El footer se actualizó en el backend.'); },
+      error: () => { this.saving.set(false); this.toast.error('No pudimos guardar el footer', 'Inténtalo nuevamente.'); },
     });
-    this.toast.success('Cambios guardados', '"Footer" se actualizó en la web.');
   }
 
   goToPanel(): void {
@@ -433,9 +451,12 @@ export class AdminContent {
   }
 
   resetContent(): void {
-    this.cms.reset();
-    this.loadTab(this.tab());
-    this.toast.info('Contenido restaurado', 'El CMS volvió a los datos base del sitio.');
+    if (this.saving()) return;
+    this.saving.set(true);
+    this.cms.load(true).subscribe({
+      next: () => { this.saving.set(false); this.toast.info('Contenido recargado', 'Se leyó nuevamente el estado del backend.'); },
+      error: () => { this.saving.set(false); this.toast.error('No pudimos recargar', 'Verifica tu conexión y sesión.'); },
+    });
   }
 
   private loadTab(tab: string): void {

@@ -72,7 +72,7 @@ export class ClientDashboard implements OnInit {
 
   readonly active = signal('resumen');
   readonly activeLabel = computed(() => this.nav.find((n) => n.id === this.active())?.label ?? '');
-  ngOnInit(): void { this.projectsService.clientList().subscribe(items => this.projects.set(items.map(p => ({ slug: p.slug, name: p.title, progress: Number(p.results[0][0].replace('%','')) || 0, status: [p.results[0][1], 'warning'], stack: p.tags } as ProjectItem)))); this.ticketsService.load(); }
+  ngOnInit(): void { this.projectsService.clientList().subscribe(items => this.projects.set(items.map(p => ({ slug: p.slug, name: p.title, progress: p.progress, status: [p.status, p.progress === 100 ? 'success' : 'warning'], stack: p.tags } as ProjectItem)))); this.ticketsService.load(); }
 
   navClasses(id: string): string {
     const on = id === this.active();

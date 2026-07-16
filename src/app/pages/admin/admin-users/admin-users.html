@@ -56,9 +56,8 @@
             <tr class="text-left font-mono text-[11px] tracking-[var(--ls-label)] text-text-muted uppercase">
               <th class="px-6 py-3 font-medium">Usuario</th>
               <th class="px-6 py-3 font-medium">Rol</th>
-              <th class="px-6 py-3 font-medium">Empresa</th>
               <th class="px-6 py-3 font-medium">Estado</th>
-              <th class="px-6 py-3 font-medium">Último acceso</th>
+              <th class="px-6 py-3 font-medium">Creado</th>
               <th class="px-6 py-3 font-medium"></th>
             </tr>
           </thead>
@@ -80,9 +79,8 @@
                   </div>
                 </td>
                 <td class="px-6 py-3.5"><app-badge [tone]="roleMeta[u.role].tone" [dot]="true">{{ roleMeta[u.role].label }}</app-badge></td>
-                <td class="px-6 py-3.5 whitespace-nowrap text-text-muted">{{ u.company || '—' }}</td>
-                <td class="px-6 py-3.5"><app-badge [tone]="statusTone[u.status]">{{ statusLabel[u.status] }}</app-badge></td>
-                <td class="px-6 py-3.5 font-mono text-[13px] whitespace-nowrap text-text-muted">{{ u.lastAccess }}</td>
+                <td class="px-6 py-3.5"><app-badge [tone]="u.isActive ? 'success' : 'neutral'">{{ u.isActive ? 'Activo' : 'Inactivo' }}</app-badge></td>
+                <td class="px-6 py-3.5 font-mono text-[13px] whitespace-nowrap text-text-muted">{{ u.createdAt }}</td>
                 <td class="px-6 py-3.5 text-right"><app-button variant="ghost" size="sm" (clicked)="openEdit(u)">Editar</app-button></td>
               </tr>
             }
@@ -127,6 +125,17 @@
             />
           </div>
 
+          @if (isNew()) {
+            <app-input
+              label="Contraseña temporal"
+              type="password"
+              placeholder="Mínimo 8 caracteres"
+              [required]="true"
+              [value]="e.draft.password"
+              (valueChange)="setField('password', $event)"
+            />
+          }
+
           <div>
             <label class="mb-2.5 block text-sm font-semibold text-text-strong">Rol</label>
             <div class="grid grid-cols-[repeat(auto-fit,minmax(min(100%,200px),1fr))] gap-3">
@@ -157,21 +166,16 @@
             </div>
           </div>
 
-          @if (e.draft.role === 'client') {
-            <app-input label="Empresa (cliente)" placeholder="Comercial Andina" [value]="e.draft.company" (valueChange)="setField('company', $event)" />
-          }
-
-          <app-select label="Estado" [options]="statusOptions" [value]="e.draft.status" (valueChange)="setField('status', $any($event))" />
-
-          <label class="flex cursor-pointer items-start gap-2.5 text-[13.5px] text-text-muted">
-            <input type="checkbox" class="mt-[3px] accent-brand-orange" [checked]="e.draft.sendInvite" (change)="setField('sendInvite', $any($event.target).checked)" />
-            Enviar correo de invitación para que defina su contraseña.
-          </label>
         </div>
 
         <div class="flex items-center justify-between gap-3 border-t border-border-subtle px-6 py-[18px]">
           @if (!isNew()) {
-            <button type="button" class="cursor-pointer text-sm font-medium text-danger" (click)="deleteFromDrawer()">Eliminar</button>
+            <div class="flex gap-3">
+              @if (isInactive(e.id)) {
+                <button type="button" class="cursor-pointer text-sm font-medium text-success" (click)="activateFromDrawer()">Activar</button>
+              }
+              <button type="button" class="cursor-pointer text-sm font-medium text-danger" (click)="deleteFromDrawer()">Eliminar</button>
+            </div>
           } @else {
             <span></span>
           }

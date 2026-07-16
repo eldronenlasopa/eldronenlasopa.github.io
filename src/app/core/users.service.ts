@@ -5,25 +5,21 @@ import type { ApiAdminUser } from './models/api.models';
 import type { BadgeTone } from '../ui/data-display/badge/badge';
 
 export type AdminUserRole = 'admin' | 'client';
-export type AdminUserStatus = 'Active' | 'Invited' | 'Suspended';
 
 export interface AdminUser {
   id: string;
   name: string;
   email: string;
   role: AdminUserRole;
-  company: string;
-  status: AdminUserStatus;
-  lastAccess: string;
+  isActive: boolean;
+  createdAt: string;
 }
 
 export interface AdminUserInput {
   name: string;
   email: string;
   role: AdminUserRole;
-  company: string;
-  status: AdminUserStatus;
-  sendInvite: boolean;
+  password: string;
 }
 
 export const ROLE_META: Record<AdminUserRole, { label: string; tone: BadgeTone; color: string; icon: string; description: string }> = {
@@ -43,25 +39,19 @@ export const ROLE_META: Record<AdminUserRole, { label: string; tone: BadgeTone; 
   },
 };
 
-export const STATUS_TONE: Record<AdminUserStatus, BadgeTone> = { Active: 'success', Invited: 'info', Suspended: 'neutral' };
-export const STATUS_LABEL: Record<AdminUserStatus, string> = { Active: 'Activo', Invited: 'Invitado', Suspended: 'Suspendido' };
-
 function toAdminUser(item: ApiAdminUser): AdminUser {
   return {
     id: item.id,
     name: item.name,
     email: item.email,
-    role: item.role === 'admin' ? 'admin' : 'client',
-    company: item.companyName ?? '',
-    status: (item.status as AdminUserStatus) || 'Invited',
-    lastAccess: item.lastLoginAt
-      ? new Date(item.lastLoginAt).toLocaleString('es-PE', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })
-      : 'Sin ingresar',
+    role: item.role.toLowerCase() === 'admin' ? 'admin' : 'client',
+    isActive: item.isActive,
+    createdAt: new Date(item.createdAt).toLocaleDateString('es-PE', { day: '2-digit', month: 'short', year: 'numeric' }),
   };
 }
 
-function toApiInput(input: AdminUserInput) {
-  return { name: input.name, email: input.email, role: input.role, companyName: input.company || undefined, status: input.status, sendInvite: input.sendInvite };
+function apiRole(role: AdminUserRole): string {
+  return role === 'admin' ? 'Admin' : 'Client';
 }
 
 /** El rol es solo la asignación — el backend aplica los permisos correspondientes. */
@@ -71,25 +61,38 @@ export class UsersService {
   private readonly _users = signal<AdminUser[]>([]);
   readonly users = this._users.asReadonly();
 
-  load(): void {
-    this.api.adminUsers().subscribe((items) => this._users.set(items.map(toAdminUser)));
+  load(): Observable<AdminUser[]> {
+    return this.api.adminUsers().pipe(
+      map((items) => items.map(toAdminUser)),
+      tap((items) => this._users.set(items)),
+    );
   }
 
   create(input: AdminUserInput): Observable<AdminUser> {
-    return this.api.createAdminUser(toApiInput(input)).pipe(
+    return this.api.createAdminUser({ name: input.name, email: input.email, password: input.password, role: apiRole(input.role) }).pipe(
       map(toAdminUser),
       tap((user) => this._users.update((list) => [...list, user])),
     );
   }
 
   update(id: string, input: AdminUserInput): Observable<AdminUser> {
-    return this.api.updateAdminUser(id, toApiInput(input)).pipe(
+    return this.api.updateAdminUser(id, { name: input.name, email: input.email, role: apiRole(input.role) }).pipe(
       map(toAdminUser),
       tap((user) => this._users.update((list) => list.map((u) => (u.id === id ? user : u)))),
     );
   }
 
   remove(id: string): Observable<void> {
-    return this.api.deleteAdminUser(id).pipe(tap(() => this._users.update((list) => list.filter((u) => u.id !== id))));
+    return this.api.deleteAdminUser(id).pipe(
+      tap(() => this._users.update((list) => list.filter((u) => u.id !== id))),
+      map(() => undefined),
+    );
+  }
+
+  activate(id: string): Observable<AdminUser> {
+    return this.api.activateAdminUser(id).pipe(
+      map(toAdminUser),
+      tap((user) => this._users.update((list) => list.map((item) => item.id === id ? user : item))),
+    );
   }
 }

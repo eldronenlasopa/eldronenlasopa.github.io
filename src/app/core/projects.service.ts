@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
-import { Observable, of } from 'rxjs';
-import { CmsContentService, type CmsProjectItem } from './cms-content.service';
+import { Observable, map } from 'rxjs';
+import { ApiService } from './api.service';
+import type { ApiProject } from './models/api.models';
 import { Project } from './projects-data';
 
 function slugify(value: string): string {
@@ -19,45 +20,46 @@ function projectGlyph(category: string): string {
   return '◆';
 }
 
-function toProject(project: CmsProjectItem): Project {
+function toProject(project: ApiProject): Project {
   return {
-    slug: slugify(`${project.client}-${project.title}`),
+    slug: project.slug || slugify(`${project.clientName}-${project.title}`),
     title: project.title,
-    client: project.client,
-    cat: project.cat,
-    year: project.year,
-    color: project.color,
-    tags: [project.cat, project.client].filter(Boolean),
-    metric: project.metric,
-    glyph: projectGlyph(project.cat),
-    logo: project.logo,
+    client: project.clientName,
+    cat: project.category,
+    year: String(project.year),
+    color: project.accentColor || '#FF6B35',
+    tags: project.tags ?? [],
+    metric: project.metric || '',
+    glyph: projectGlyph(project.category),
+    logo: project.imageUrl || '',
     duration: 'A medida',
-    desc: project.summary,
-    summary: project.summary,
-    challenge: project.challenge,
-    solution: project.solution,
+    desc: project.description,
+    summary: project.description,
+    challenge: project.challenge || '',
+    solution: project.solution || '',
     results: [
       [project.metric || 'A medida', 'resultado'],
-      [project.cat, 'tipo'],
-      [project.year, 'año'],
+      [project.category, 'tipo'],
+      [String(project.year), 'año'],
     ],
+    progress: project.progress,
+    status: project.status,
   };
 }
 
 @Injectable({ providedIn: 'root' })
 export class ProjectsService {
-  private readonly cms = inject(CmsContentService);
+  private readonly api = inject(ApiService);
 
   list(): Observable<Project[]> {
-    return of(this.cms.projects().map(toProject));
+    return this.api.projects().pipe(map((projects) => projects.map(toProject)));
   }
 
   clientList(): Observable<Project[]> {
-    return this.list();
+    return this.api.clientProjects().pipe(map((projects) => projects.map(toProject)));
   }
 
   bySlug(slug: string): Observable<Project> {
-    const projects = this.cms.projects().map(toProject);
-    return of(projects.find((project) => project.slug === slug) ?? projects[0]);
+    return this.api.project(slug).pipe(map(toProject));
   }
 }
