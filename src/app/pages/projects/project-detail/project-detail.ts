@@ -7,6 +7,7 @@ import { Wordmark } from '../../../ui/brand/wordmark/wordmark';
 import { WhatsAppFab } from '../../../ui/marketing/whatsapp-fab/whatsapp-fab';
 import { Project } from '../../../core/projects-data';
 import { ProjectsService } from '../../../core/projects.service';
+import { SeoService } from '../../../core/services/seo.service';
 
 @Component({
   selector: 'app-project-detail',
@@ -18,6 +19,7 @@ export class ProjectDetail implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly projectsService = inject(ProjectsService);
+  private readonly seo = inject(SeoService);
 
   private readonly projectState = signal<Project | undefined>(undefined);
   readonly notFound = signal(false);
@@ -33,6 +35,13 @@ export class ProjectDetail implements OnInit {
     ).subscribe({
       next: project => {
         this.projectState.set(project);
+        this.seo.update({
+          title: `${project.title} para ${project.client} | DronLab`,
+          description: project.summary || `Proyecto de ${project.cat.toLowerCase()} desarrollado por DronLab para ${project.client}.`,
+          path: `/proyectos/${project.slug}`,
+          image: project.logo,
+          type: 'article',
+        });
         this.metaRows = [
           ['Cliente', project.client],
           ['Categoría', project.cat],
@@ -41,6 +50,12 @@ export class ProjectDetail implements OnInit {
         ];
       },
       error: () => {
+        this.seo.update({
+          title: 'Proyecto no encontrado | DronLab',
+          description: 'El proyecto solicitado no está disponible.',
+          path: this.router.url,
+          index: false,
+        });
         this.notFound.set(true);
         this.projectState.set(undefined);
         this.metaRows = [];

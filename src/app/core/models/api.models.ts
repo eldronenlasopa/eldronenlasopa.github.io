@@ -23,3 +23,4 @@ export interface ApiReview { id: string; authorName: string; companyName?: strin
 export interface ApiCompany { id: string; name: string; sector?: string; description?: string; logoUrl?: string; websiteUrl?: string; isPublished: boolean; }
 export interface ApiTicket { id: string; code: string; title: string; description: string; priority: string; status: string; createdAt: string; updatedAt?: string; }
 export interface ApiUser { id: string; name: string; email: string; role: string; token: string; }
+export interface ApiAdminUser { id: string; name: string; email: string; role: string; companyName?: string; status: string; lastLoginAt?: string; }

@@ -1,39 +1,72 @@
-<div
-  class="relative flex min-h-screen items-center justify-center overflow-hidden bg-[image:var(--gradient-ink)] p-6"
->
-  <div
-    class="pointer-events-none absolute inset-0 bg-[image:var(--texture-grid)] bg-[length:var(--texture-grid-size)] opacity-40 [mask-image:radial-gradient(circle_at_50%_0%,#000,transparent_70%)]"
-  ></div>
+<div class="grid min-h-screen grid-cols-1 bg-surface-page font-body lg:grid-cols-2">
+  <!-- Aside -->
+  <aside class="relative flex flex-col justify-between overflow-hidden bg-[image:var(--gradient-ink)] p-8 text-text-on-inverse sm:p-12 lg:p-14">
+    <div
+      class="pointer-events-none absolute inset-0 bg-[image:var(--texture-grid)] bg-[length:var(--texture-grid-size)] opacity-40 [mask-image:radial-gradient(circle_at_30%_20%,#000,transparent_72%)]"
+    ></div>
+    <div
+      class="pointer-events-none absolute -bottom-36 -left-20 h-[440px] w-[440px] bg-[radial-gradient(circle,rgba(34,211,238,0.2),transparent_66%)]"
+    ></div>
 
-  <app-card class="relative w-[min(400px,100%)]" padding="0">
-    <form (ngSubmit)="onSubmit()" class="flex flex-col gap-5 p-8">
-      <div class="mb-1 flex justify-center">
-        <app-wordmark size="lg" />
+    <div class="relative"><app-wordmark tone="light" size="sm" /></div>
+
+    <div class="relative max-w-[380px]">
+      <h1 class="m-0 font-display text-[clamp(28px,4vw,40px)] font-bold leading-[var(--lh-heading)] tracking-[var(--ls-tight)]">
+        Tu proyecto, siempre a la vista
+      </h1>
+      <p class="mt-4 text-base leading-[var(--lh-body)] text-text-inverse-muted">
+        Accede para ver avances, tickets, facturas y archivos en un solo lugar.
+      </p>
+    </div>
+
+    <div class="relative font-mono text-xs text-text-faint">© 2026 DronLab · El Dron en la Sopa</div>
+  </aside>
+
+  <!-- Form -->
+  <main class="flex items-center justify-center p-8 sm:p-12 lg:p-14">
+    <form (ngSubmit)="onSubmit()" class="w-full max-w-[400px]">
+      <div class="mb-3 font-mono text-[13px] tracking-[var(--ls-label)] text-brand-orange-600 uppercase">// Acceso</div>
+      <h2 class="m-0 mb-2 font-display text-[28px] font-bold text-text-strong">Inicia sesión</h2>
+      <p class="m-0 mb-7 text-[15px] text-text-muted">Selecciona tu tipo de cuenta y entra.</p>
+
+      <div class="mb-6 flex gap-1.5 rounded-pill bg-surface-sunken p-[5px]">
+        <button type="button" [class]="roleButtonClasses('client')" (click)="role.set('client')">Cliente</button>
+        <button type="button" [class]="roleButtonClasses('admin')" (click)="role.set('admin')">Administrador</button>
       </div>
-      <div class="text-center">
-        <h1 class="m-0 font-display text-xl font-bold text-text-strong">Acceso de clientes</h1>
-        <p class="m-1 mt-1.5 font-body text-sm text-text-muted">Ingresa a tu panel de proyectos y tickets.</p>
+
+      <div class="mb-[18px]">
+        <app-input
+          label="Email"
+          type="email"
+          [placeholder]="emailPlaceholder()"
+          [required]="true"
+          [value]="email()"
+          (valueChange)="email.set($event)"
+        />
+      </div>
+      <div class="mb-2">
+        <app-input
+          label="Contraseña"
+          type="password"
+          placeholder="••••••••"
+          [required]="true"
+          [value]="password()"
+          (valueChange)="password.set($event)"
+        />
+      </div>
+      <div class="mb-6 text-right">
+        <a routerLink="/olvide-password" class="font-body text-[13.5px] text-text-link no-underline">¿Olvidaste tu contraseña?</a>
       </div>
 
-      <app-input
-        label="Correo"
-        type="email"
-        placeholder="tucorreo@empresa.com"
-        [required]="true"
-        [value]="email()"
-        (valueChange)="email.set($event)"
-      />
-      <app-input
-        label="Contraseña"
-        type="password"
-        placeholder="••••••••"
-        [required]="true"
-        [value]="password()"
-        (valueChange)="password.set($event)"
-      />
+      <app-button type="submit" variant="primary" size="lg" [fullWidth]="true" [disabled]="submitting()">
+        {{ submitLabel() }}
+        <span slot="icon-right">→</span>
+      </app-button>
 
-      <app-button type="submit" variant="primary" size="lg" [fullWidth]="true">Entrar</app-button>
-      <p class="m-0 text-center font-mono text-xs text-text-faint">Demo: cualquier contraseña funciona.</p>
+      <div class="mt-6 text-center text-sm text-text-muted">
+        ¿Aún no eres cliente?
+        <a routerLink="/solicitar-propuesta" class="font-semibold text-text-link no-underline">Solicita una propuesta</a>
+      </div>
     </form>
-  </app-card>
+  </main>
 </div>

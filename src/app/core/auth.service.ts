@@ -59,4 +59,12 @@ export class AuthService {
     localStorage.removeItem(STORAGE_KEY);
     localStorage.removeItem('dronlab_token');
   }
+
+  requestPasswordReset(email: string): Observable<void> {
+    return this.api.forgotPassword(email);
+  }
+
+  resetPassword(token: string, password: string): Observable<void> {
+    return this.api.resetPassword(token, password);
+  }
 }

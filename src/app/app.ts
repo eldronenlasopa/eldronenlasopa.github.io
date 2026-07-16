@@ -6,6 +6,7 @@ import { ToastStack } from './ui/feedback/toast/toast-stack';
 import { DialogOutlet } from './ui/feedback/dialog/dialog-outlet';
 import { LoadingService } from './core/services/loading.service';
 import { AnalyticsService } from './core/services/analytics.service';
+import { SeoService } from './core/services/seo.service';
 
 @Component({
   selector: 'app-root',
@@ -18,10 +19,12 @@ export class App {
   private readonly router = inject(Router);
   private readonly loading = inject(LoadingService);
   private readonly analytics = inject(AnalyticsService);
+  private readonly seo = inject(SeoService);
   private readonly destroyRef = inject(DestroyRef);
 
   constructor() {
     this.analytics.init();
+    this.seo.init();
     const subscription = this.router.events.pipe(
       filter(event => event instanceof NavigationStart || event instanceof NavigationEnd || event instanceof NavigationCancel || event instanceof NavigationError),
     ).subscribe(event => {

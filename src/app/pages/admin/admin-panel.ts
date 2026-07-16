@@ -39,6 +39,7 @@ const NAV: NavItem[] = [
   { id: 'clientes', label: 'Clientes', icon: '◑' },
   { id: 'proyectos', label: 'Proyectos', icon: '▤' },
   { id: 'tickets', label: 'Tickets', icon: '◇' },
+  { id: 'usuarios', label: 'Usuarios', icon: '◕', route: '/admin/usuarios' },
   { id: 'contenido', label: 'Contenido web', icon: '❏', route: '/admin/contenido' },
 ];
 

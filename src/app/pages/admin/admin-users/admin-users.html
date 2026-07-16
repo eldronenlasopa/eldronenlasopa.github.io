@@ -1,0 +1,188 @@
+<div class="min-h-screen bg-surface-page bg-[radial-gradient(rgba(11,15,26,0.05)_1.2px,transparent_1.2px)] bg-[length:22px_22px] font-body">
+  <!-- Header -->
+  <header class="relative overflow-hidden bg-[image:var(--gradient-ink)] px-[clamp(20px,5vw,40px)] pt-[clamp(20px,4vw,32px)] pb-[clamp(44px,6vw,64px)] text-text-on-inverse">
+    <div
+      class="pointer-events-none absolute inset-0 bg-[image:var(--texture-grid)] bg-[length:var(--texture-grid-size)] opacity-45 [mask-image:radial-gradient(circle_at_70%_0%,#000,transparent_74%)]"
+    ></div>
+    <div
+      class="pointer-events-none absolute -top-[120px] -right-[60px] h-[420px] w-[420px] bg-[radial-gradient(circle,rgba(255,107,53,0.16),transparent_66%)]"
+    ></div>
+
+    <div class="relative mx-auto max-w-[1200px]">
+      <div class="mb-7 flex flex-wrap items-center justify-between gap-4">
+        <app-wordmark tone="light" size="sm" />
+        <app-button variant="inverse" size="sm" (clicked)="goToPanel()">← Panel admin</app-button>
+      </div>
+      <div class="mb-3 font-mono text-xs tracking-[var(--ls-label)] text-brand-cyan uppercase">// Gestión de usuarios</div>
+      <h1 class="m-0 font-display text-[clamp(26px,4.5vw,40px)] font-bold tracking-[var(--ls-tight)] leading-[var(--lh-heading)]">Usuarios y roles</h1>
+    </div>
+  </header>
+
+  <div class="mx-auto max-w-[1200px] px-[clamp(20px,5vw,40px)] pb-[clamp(56px,8vw,96px)]">
+    <!-- Toolbar -->
+    <div class="mt-6 mb-6 flex flex-wrap items-center justify-between gap-4">
+      <div class="flex flex-wrap gap-2">
+        <button type="button" [class]="filterClasses('todos')" (click)="filter.set('todos')">
+          Todos <span class="font-mono text-xs opacity-70">{{ counts().todos }}</span>
+        </button>
+        <button type="button" [class]="filterClasses('admin')" (click)="filter.set('admin')">
+          Administradores <span class="font-mono text-xs opacity-70">{{ counts().admin }}</span>
+        </button>
+        <button type="button" [class]="filterClasses('client')" (click)="filter.set('client')">
+          Clientes <span class="font-mono text-xs opacity-70">{{ counts().client }}</span>
+        </button>
+      </div>
+
+      <div class="flex flex-wrap gap-3">
+        <div class="relative min-w-[220px]">
+          <span class="pointer-events-none absolute top-1/2 left-3.5 -translate-y-1/2 text-[15px] text-text-faint">⌕</span>
+          <input
+            type="text"
+            [value]="query()"
+            (input)="query.set($any($event.target).value)"
+            placeholder="Buscar por nombre o correo…"
+            class="w-full rounded-pill border-[1.5px] border-border-default bg-surface-card py-[11px] pr-3.5 pl-[38px] font-body text-[14.5px] text-text-body outline-none focus:border-brand-cyan focus:shadow-glow-soft-cyan"
+          />
+        </div>
+        <app-button variant="primary" (clicked)="openNew()"><span slot="icon-left">+</span>Nuevo usuario</app-button>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <app-card elevation="sm" padding="0">
+      <div class="overflow-x-auto">
+        <table class="w-full border-collapse text-[14.5px]">
+          <thead>
+            <tr class="text-left font-mono text-[11px] tracking-[var(--ls-label)] text-text-muted uppercase">
+              <th class="px-6 py-3 font-medium">Usuario</th>
+              <th class="px-6 py-3 font-medium">Rol</th>
+              <th class="px-6 py-3 font-medium">Empresa</th>
+              <th class="px-6 py-3 font-medium">Estado</th>
+              <th class="px-6 py-3 font-medium">Último acceso</th>
+              <th class="px-6 py-3 font-medium"></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (u of shown(); track u.id) {
+              <tr class="border-t border-border-subtle text-text-body">
+                <td class="px-6 py-3.5">
+                  <div class="flex items-center gap-3">
+                    <span
+                      class="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full font-display text-[13px] font-bold"
+                      [style.background]="roleMeta[u.role].color + '22'"
+                      [style.color]="roleMeta[u.role].color"
+                      >{{ initials(u.name) }}</span
+                    >
+                    <div>
+                      <div class="font-semibold text-text-strong">{{ u.name }}</div>
+                      <div class="text-[12.5px] text-text-muted">{{ u.email }}</div>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-6 py-3.5"><app-badge [tone]="roleMeta[u.role].tone" [dot]="true">{{ roleMeta[u.role].label }}</app-badge></td>
+                <td class="px-6 py-3.5 whitespace-nowrap text-text-muted">{{ u.company || '—' }}</td>
+                <td class="px-6 py-3.5"><app-badge [tone]="statusTone[u.status]">{{ statusLabel[u.status] }}</app-badge></td>
+                <td class="px-6 py-3.5 font-mono text-[13px] whitespace-nowrap text-text-muted">{{ u.lastAccess }}</td>
+                <td class="px-6 py-3.5 text-right"><app-button variant="ghost" size="sm" (clicked)="openEdit(u)">Editar</app-button></td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      @if (shown().length === 0) {
+        <div class="py-12 text-center text-text-muted">Sin usuarios que coincidan.</div>
+      }
+    </app-card>
+  </div>
+
+  <!-- Drawer -->
+  @if (editing(); as e) {
+    <div
+      class="au-overlay fixed inset-0 z-[900] flex justify-end bg-[rgba(6,9,18,0.55)] backdrop-blur-[4px]"
+      (mousedown)="onBackdrop($event)"
+    >
+      <div class="au-drawer flex h-full w-[min(480px,100%)] flex-col overflow-auto border-l border-border-subtle bg-surface-card shadow-lg">
+        <div class="flex items-center justify-between border-b border-border-subtle px-6 py-5">
+          <h2 class="m-0 font-display text-xl font-bold text-text-strong">{{ isNew() ? 'Crear usuario' : 'Editar usuario' }}</h2>
+          <button
+            type="button"
+            aria-label="Cerrar"
+            class="flex h-8 w-8 cursor-pointer items-center justify-center rounded-sm border border-border-subtle bg-surface-page text-lg text-text-muted"
+            (click)="closeDrawer()"
+          >
+            ×
+          </button>
+        </div>
+
+        <div class="flex flex-1 flex-col gap-5 p-6">
+          <div class="grid grid-cols-[repeat(auto-fit,minmax(min(100%,200px),1fr))] gap-4">
+            <app-input label="Nombre completo" placeholder="María Fernández" [required]="true" [value]="e.draft.name" (valueChange)="setField('name', $event)" />
+            <app-input
+              label="Email"
+              type="email"
+              placeholder="usuario@empresa.com"
+              [required]="true"
+              [value]="e.draft.email"
+              (valueChange)="setField('email', $event)"
+            />
+          </div>
+
+          <div>
+            <label class="mb-2.5 block text-sm font-semibold text-text-strong">Rol</label>
+            <div class="grid grid-cols-[repeat(auto-fit,minmax(min(100%,200px),1fr))] gap-3">
+              @for (r of roles; track r) {
+                <button
+                  type="button"
+                  class="cursor-pointer rounded-lg p-4 text-left transition-all duration-150 ease-out"
+                  [style.background]="e.draft.role === r ? roleMeta[r].color + '12' : 'var(--surface-sunken)'"
+                  [style.border]="'1.5px solid ' + (e.draft.role === r ? roleMeta[r].color : 'var(--border-subtle)')"
+                  [style.box-shadow]="e.draft.role === r ? '0 0 0 3px ' + roleMeta[r].color + '22' : 'none'"
+                  (click)="setField('role', r)"
+                >
+                  <div class="mb-2 flex items-center gap-2.5">
+                    <span
+                      class="inline-flex h-[30px] w-[30px] items-center justify-center rounded-sm text-[15px]"
+                      [style.background]="roleMeta[r].color + '22'"
+                      [style.color]="roleMeta[r].color"
+                      >{{ roleMeta[r].icon }}</span
+                    >
+                    <span class="font-display text-[15.5px] font-semibold text-text-strong">{{ roleMeta[r].label }}</span>
+                    @if (e.draft.role === r) {
+                      <span class="ml-auto text-[15px]" [style.color]="roleMeta[r].color">✓</span>
+                    }
+                  </div>
+                  <div class="text-[12.5px] leading-[var(--lh-snug)] text-text-muted">{{ roleMeta[r].description }}</div>
+                </button>
+              }
+            </div>
+          </div>
+
+          @if (e.draft.role === 'client') {
+            <app-input label="Empresa (cliente)" placeholder="Comercial Andina" [value]="e.draft.company" (valueChange)="setField('company', $event)" />
+          }
+
+          <app-select label="Estado" [options]="statusOptions" [value]="e.draft.status" (valueChange)="setField('status', $any($event))" />
+
+          <label class="flex cursor-pointer items-start gap-2.5 text-[13.5px] text-text-muted">
+            <input type="checkbox" class="mt-[3px] accent-brand-orange" [checked]="e.draft.sendInvite" (change)="setField('sendInvite', $any($event.target).checked)" />
+            Enviar correo de invitación para que defina su contraseña.
+          </label>
+        </div>
+
+        <div class="flex items-center justify-between gap-3 border-t border-border-subtle px-6 py-[18px]">
+          @if (!isNew()) {
+            <button type="button" class="cursor-pointer text-sm font-medium text-danger" (click)="deleteFromDrawer()">Eliminar</button>
+          } @else {
+            <span></span>
+          }
+          <div class="flex gap-3">
+            <app-button variant="ghost" (clicked)="closeDrawer()">Cancelar</app-button>
+            <app-button variant="primary" [disabled]="!draftValid() || saving()" (clicked)="save()"
+              >{{ isNew() ? 'Crear usuario' : 'Guardar' }}<span slot="icon-right">→</span></app-button
+            >
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+</div>
