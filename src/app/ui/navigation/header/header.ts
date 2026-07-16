@@ -1,7 +1,6 @@
 import { Component, computed, input, output, signal } from '@angular/core';
 import { Wordmark } from '../../brand/wordmark/wordmark';
 import { Button } from '../../actions/button/button';
-import { IconButton } from '../../actions/icon-button/icon-button';
 
 export interface HeaderLink {
   label: string;
@@ -15,10 +14,10 @@ const DEFAULT_LINKS: HeaderLink[] = [
   { label: 'Nosotros', href: '#nosotros' },
 ];
 
-/** Marketing site top navigation. Sticky, links + CTA. Glassy on light, solid on dark. Collapses to hamburger menu below `md`. */
+/** Marketing site top navigation. Sticky, links + CTA. Glassy on light, solid on dark. Collapses to hamburger menu below 820px. */
 @Component({
   selector: 'app-header',
-  imports: [Wordmark, Button, IconButton],
+  imports: [Wordmark, Button],
   templateUrl: './header.html',
 })
 export class Header {
@@ -38,27 +37,33 @@ export class Header {
 
   readonly headerClasses = computed(() =>
     [
-      'block backdrop-blur-md backdrop-saturate-[1.8]',
+      'relative block backdrop-blur-md backdrop-saturate-[1.8]',
       this.inverse()
         ? 'bg-surface-inverse border-b border-border-inverse'
         : 'bg-[rgba(255,255,255,0.86)] border-b border-border-subtle',
     ].join(' '),
   );
 
-  readonly iconClasses = computed(() =>
-    this.inverse() ? 'text-text-on-inverse' : 'text-text-strong',
-  );
+  readonly barClasses = computed(() => {
+    const base = ['block h-0.5 w-6 rounded-sm transition-[transform,opacity] duration-200 ease-out', this.inverse() ? 'bg-text-on-inverse' : 'bg-text-strong'].join(' ');
+    const open = this.menuOpen();
+    return [
+      `${base} ${open ? 'translate-y-[7px] rotate-45' : ''}`,
+      `${base} ${open ? 'opacity-0' : ''}`,
+      `${base} ${open ? '-translate-y-[7px] -rotate-45' : ''}`,
+    ];
+  });
 
   readonly mobileNavClasses = computed(() =>
     [
-      'flex flex-col gap-1 px-5 pb-5 pt-1 md:hidden border-t',
-      this.inverse() ? 'border-border-inverse' : 'border-border-subtle',
+      'absolute inset-x-0 top-full z-[60] flex min-[821px]:hidden flex-col gap-1 px-[clamp(20px,5vw,32px)] pt-3 pb-5 shadow-lg border-b',
+      this.inverse() ? 'bg-surface-inverse border-border-inverse' : 'bg-surface-card border-border-subtle',
     ].join(' '),
   );
 
   readonly mobileLinkClasses = computed(() =>
     [
-      'block py-2.5 font-body text-base font-medium no-underline transition-colors duration-200 ease-out hover:text-brand-orange',
+      'rounded-sm px-2 py-3 font-body text-base font-medium no-underline transition-colors duration-200 ease-out hover:text-brand-orange',
       this.inverse() ? 'text-text-on-inverse' : 'text-text-body',
     ].join(' '),
   );

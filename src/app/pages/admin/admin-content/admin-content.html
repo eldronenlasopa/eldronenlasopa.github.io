@@ -1,0 +1,244 @@
+<div class="min-h-screen bg-surface-page bg-[radial-gradient(rgba(11,15,26,0.05)_1.2px,transparent_1.2px)] bg-[length:22px_22px] font-body">
+  <!-- Header -->
+  <header class="relative overflow-hidden bg-[image:var(--gradient-ink)] px-[clamp(20px,5vw,40px)] pt-[clamp(20px,4vw,32px)] pb-[clamp(52px,7vw,84px)] text-text-on-inverse">
+    <div
+      class="pointer-events-none absolute inset-0 bg-[image:var(--texture-grid)] bg-[length:var(--texture-grid-size)] opacity-45 [mask-image:radial-gradient(circle_at_70%_0%,#000,transparent_74%)]"
+    ></div>
+    <div
+      class="pointer-events-none absolute -top-[120px] -right-[60px] h-[420px] w-[420px] bg-[radial-gradient(circle,rgba(255,107,53,0.16),transparent_66%)]"
+    ></div>
+
+    <div class="relative mx-auto max-w-[1200px]">
+      <div class="mb-7 flex flex-wrap items-center justify-between gap-4">
+        <app-wordmark tone="light" size="sm" />
+        <div class="flex flex-wrap gap-2">
+          <app-button variant="ghost-inverse" size="sm" (clicked)="goToSite()">Ver web</app-button>
+          <app-button variant="ghost-inverse" size="sm" (clicked)="resetContent()">Restaurar base</app-button>
+          <app-button variant="inverse" size="sm" (clicked)="goToPanel()">← Panel admin</app-button>
+        </div>
+      </div>
+      <div class="mb-3 font-mono text-xs tracking-[var(--ls-label)] text-brand-cyan uppercase">// Gestión de contenido</div>
+      <h1 class="m-0 font-display text-[clamp(26px,4.5vw,40px)] font-bold tracking-[var(--ls-tight)] leading-[var(--lh-heading)]">
+        Contenido de la web
+      </h1>
+    </div>
+  </header>
+
+  <div class="mx-auto max-w-[1200px] px-[clamp(20px,5vw,40px)] pb-[clamp(56px,8vw,96px)]">
+    <!-- Tab bar -->
+    <div
+      class="relative -mt-[26px] mb-7 flex flex-wrap gap-1 rounded-lg border border-border-subtle bg-surface-card p-1.5 shadow-md"
+    >
+      @for (t of tabs; track t.id) {
+        <button type="button" [class]="tabClasses(t.id)" (click)="tab.set(t.id)">
+          <span class="text-[15px]">{{ t.icon }}</span>{{ t.label }}
+        </button>
+      }
+    </div>
+
+    @if (tab() === 'header') {
+      <!-- Header manager -->
+      <app-card elevation="sm" class="block max-w-[720px]">
+        <h3 class="m-0 mb-1 font-display text-lg font-semibold text-text-strong">Navegación del header</h3>
+        <p class="m-0 mb-5 text-sm text-text-muted">Enlaces del menú principal y texto del botón de acción.</p>
+        <div class="flex flex-col gap-3">
+          @for (l of headerLinks(); track $index; let i = $index) {
+            <div class="flex items-end gap-3">
+              <div class="flex-1">
+                <app-input [label]="i === 0 ? 'Etiqueta' : undefined" [value]="l.label" (valueChange)="setHeaderLink(i, 'label', $event)" />
+              </div>
+              <div class="flex-1">
+                <app-input [label]="i === 0 ? 'Destino (href)' : undefined" [value]="l.href" (valueChange)="setHeaderLink(i, 'href', $event)" />
+              </div>
+              <button type="button" class="cursor-pointer pb-3 text-sm font-medium text-danger" (click)="removeHeaderLink(i)">Quitar</button>
+            </div>
+          }
+        </div>
+        <div class="mt-3.5">
+          <app-button variant="outline" size="sm" (clicked)="addHeaderLink()"><span slot="icon-left">+</span>Añadir enlace</app-button>
+        </div>
+        <div class="mt-5 max-w-[320px] border-t border-border-subtle pt-5">
+          <app-input label="Texto del botón (CTA)" [value]="headerCta()" (valueChange)="headerCta.set($event)" />
+        </div>
+        <div class="mt-6 flex justify-end">
+          <app-button variant="primary" (clicked)="saveHeader()">Guardar header</app-button>
+        </div>
+      </app-card>
+    } @else if (tab() === 'footer') {
+      <!-- Footer manager -->
+      <app-card elevation="sm" class="block max-w-[860px]">
+        <h3 class="m-0 mb-1 font-display text-lg font-semibold text-text-strong">Pie de página (footer)</h3>
+        <p class="m-0 mb-5 text-sm text-text-muted">Texto de marca, datos de contacto y columnas de enlaces.</p>
+        <div class="grid grid-cols-[repeat(auto-fit,minmax(min(100%,240px),1fr))] gap-4">
+          <div class="col-span-full">
+            <app-textarea label="Texto de marca" [rows]="2" [value]="footerAbout()" (valueChange)="footerAbout.set($event)" />
+          </div>
+          <app-input label="Email de contacto" [value]="footerEmail()" (valueChange)="footerEmail.set($event)" />
+          <app-input label="Teléfono" [value]="footerPhone()" (valueChange)="footerPhone.set($event)" />
+        </div>
+
+        <div class="mt-6 mb-2 text-sm font-semibold text-text-strong">Columnas de enlaces</div>
+        <div class="grid grid-cols-[repeat(auto-fit,minmax(min(100%,220px),1fr))] gap-4">
+          @for (c of footerColumns(); track $index; let i = $index) {
+            <div class="rounded-md border border-border-subtle bg-surface-sunken p-4">
+              <div class="mb-2.5">
+                <app-input [value]="c.title" (valueChange)="setFooterColumn(i, 'title', $event)" />
+              </div>
+              <app-textarea label="Enlaces (uno por línea)" [rows]="3" [value]="c.links" (valueChange)="setFooterColumn(i, 'links', $event)" />
+              <div class="mt-2 text-right">
+                <button type="button" class="cursor-pointer text-sm font-medium text-danger" (click)="removeFooterColumn(i)">Quitar columna</button>
+              </div>
+            </div>
+          }
+        </div>
+        <div class="mt-3.5">
+          <app-button variant="outline" size="sm" (clicked)="addFooterColumn()"><span slot="icon-left">+</span>Añadir columna</app-button>
+        </div>
+        <div class="mt-6 flex justify-end border-t border-border-subtle pt-5">
+          <app-button variant="primary" (clicked)="saveFooter()">Guardar footer</app-button>
+        </div>
+      </app-card>
+    } @else if (currentEntity(); as def) {
+      <!-- Collection manager -->
+      <div class="grid grid-cols-[minmax(240px,320px)_1fr] items-start gap-5">
+        <app-card elevation="sm" padding="0">
+          <div class="flex items-center justify-between border-b border-border-subtle px-[18px] py-4">
+            <span class="font-display text-base font-semibold text-text-strong">{{ def.title }}</span>
+            <app-badge tone="neutral">{{ items().length }}</app-badge>
+          </div>
+          <div class="flex max-h-[440px] flex-col overflow-auto">
+            @for (it of items(); track $index; let i = $index) {
+              <button type="button" [class]="rowButtonClasses(i)" (click)="pick(i)">
+                @if (rowImage(def, it)) {
+                  <span
+                    class="h-[34px] w-[34px] shrink-0 border border-border-subtle bg-cover bg-center"
+                    [class]="rowThumbShapeClass(def)"
+                    [style.background-image]="'url(' + rowImage(def, it) + ')'"
+                  ></span>
+                } @else {
+                  <span
+                    class="inline-flex h-[34px] w-[34px] shrink-0 items-center justify-center text-[15px]"
+                    [class]="rowThumbShapeClass(def)"
+                    [style.background]="rowColor(it) + '22'"
+                    [style.color]="rowColor(it)"
+                    >{{ rowGlyph(def, it) }}</span
+                  >
+                }
+                <span class="min-w-0 text-left">
+                  <span class="block truncate text-[14.5px] font-semibold text-text-strong">{{ def.rowTitle(it) }}</span>
+                  <span class="block truncate text-[12.5px] text-text-muted">{{ def.rowSub(it) }}</span>
+                </span>
+              </button>
+            }
+          </div>
+          @if (!def.fixed) {
+            <div class="p-3.5">
+              <app-button variant="outline" size="sm" [fullWidth]="true" (clicked)="addNew()"
+                ><span slot="icon-left">+</span>Añadir {{ def.addLabel }}</app-button
+              >
+            </div>
+          }
+        </app-card>
+
+        <app-card elevation="sm">
+          <div class="mb-5 flex items-center justify-between">
+            <h2 class="m-0 font-display text-[18px] font-semibold text-text-strong">{{ isNew() ? 'Nuevo registro' : 'Editar registro' }}</h2>
+            @if (!isNew() && !def.fixed) {
+              <button type="button" class="cursor-pointer text-sm font-medium text-danger" (click)="deleteItem()">Eliminar</button>
+            }
+          </div>
+          <div class="grid grid-cols-[repeat(auto-fit,minmax(min(100%,220px),1fr))] gap-4">
+            @for (f of def.fields; track f.key) {
+              <div [class]="fieldColSpanClass(f)">
+                @switch (f.type) {
+                  @case ('text') {
+                    <app-input [label]="f.label" [placeholder]="f.placeholder ?? ''" [value]="draft()[f.key]" (valueChange)="setField(f.key, $event)" />
+                  }
+                  @case ('textarea') {
+                    <app-textarea
+                      [label]="f.label"
+                      [rows]="3"
+                      [placeholder]="f.placeholder ?? ''"
+                      [value]="draft()[f.key]"
+                      (valueChange)="setField(f.key, $event)"
+                    />
+                  }
+                  @case ('select') {
+                    <app-select [label]="f.label" [options]="f.options ?? []" [value]="draft()[f.key]" (valueChange)="setField(f.key, $event)" />
+                  }
+                  @case ('color') {
+                    <label class="mb-2.5 block text-sm font-semibold text-text-strong">{{ f.label }}</label>
+                    <div class="flex flex-wrap gap-2.5">
+                      @for (c of palette; track c) {
+                        <button
+                          type="button"
+                          [attr.aria-label]="c"
+                          class="h-[34px] w-[34px] cursor-pointer rounded-sm border-2 transition-all duration-150 ease-out"
+                          [class]="draft()[f.key] === c ? 'border-text-strong' : 'border-transparent'"
+                          [style.background]="c"
+                          [style.box-shadow]="draft()[f.key] === c ? '0 0 0 3px ' + c + '44' : 'none'"
+                          (click)="setField(f.key, c)"
+                        ></button>
+                      }
+                    </div>
+                  }
+                  @case ('glyph') {
+                    <label class="mb-2.5 block text-sm font-semibold text-text-strong">{{ f.label }}</label>
+                    <div class="flex flex-wrap gap-2">
+                      @for (g of glyphs; track g) {
+                        <button
+                          type="button"
+                          class="h-10 w-10 cursor-pointer rounded-md border-[1.5px] text-lg transition-all duration-150 ease-out"
+                          [class]="
+                            draft()[f.key] === g
+                              ? 'border-brand-orange bg-[rgba(255,107,53,0.08)] text-brand-orange'
+                              : 'border-border-subtle bg-surface-sunken text-text-muted'
+                          "
+                          (click)="setField(f.key, g)"
+                        >
+                          {{ g }}
+                        </button>
+                      }
+                    </div>
+                  }
+                  @case ('image') {
+                    <label class="mb-2.5 block text-sm font-semibold text-text-strong">{{ f.label }}</label>
+                    <div class="flex items-center gap-4">
+                      <div
+                        class="flex h-[72px] shrink-0 cursor-pointer items-center justify-center overflow-hidden border-[1.5px] border-dashed border-border-default bg-surface-sunken bg-cover bg-center"
+                        [class]="f.shape === 'circle' ? 'w-[72px] rounded-full' : 'w-[92px] rounded-md'"
+                        [style.background-image]="draft()[f.key] ? 'url(' + draft()[f.key] + ')' : 'none'"
+                        (click)="fileInput.click()"
+                      >
+                        @if (!draft()[f.key]) {
+                          <span class="text-xl text-brand-cyan">↑</span>
+                        }
+                      </div>
+                      <div class="min-w-0">
+                        <div class="flex gap-2">
+                          <app-button variant="outline" size="sm" (clicked)="fileInput.click()">{{ draft()[f.key] ? 'Cambiar' : 'Subir' }}</app-button>
+                          @if (draft()[f.key]) {
+                            <button type="button" class="cursor-pointer px-1 text-sm font-medium text-danger" (click)="setField(f.key, '')">Quitar</button>
+                          }
+                        </div>
+                        @if (f.hint) {
+                          <div class="mt-2 text-xs text-text-faint">{{ f.hint }}</div>
+                        }
+                      </div>
+                      <input #fileInput type="file" accept="image/*" class="hidden" (change)="onImageChange(f.key, $event)" />
+                    </div>
+                  }
+                }
+              </div>
+            }
+          </div>
+          <div class="mt-6 flex justify-end gap-3 border-t border-border-subtle pt-5">
+            <app-button variant="primary" (clicked)="save()"
+              >{{ isNew() ? 'Crear' : 'Guardar cambios' }}<span slot="icon-right">→</span></app-button
+            >
+          </div>
+        </app-card>
+      </div>
+    }
+  </div>
+</div>

@@ -3,11 +3,14 @@
     <div>
       <app-wordmark tone="light" />
       <p class="mt-4 max-w-[260px] font-body text-sm leading-[1.6] text-text-inverse-muted">
-        <strong class="font-semibold text-text-on-inverse">El Dron en la Sopa</strong> — la tecnología está en todo,
-        hasta en la sopa. Aplicaciones, páginas y automatizaciones a medida.
+        {{ footer().about }}
       </p>
+      <div class="mt-4 space-y-1 font-mono text-xs text-text-faint">
+        <div>{{ footer().email }}</div>
+        <div>{{ footer().phone }}</div>
+      </div>
     </div>
-    @for (col of columns; track col.title) {
+    @for (col of columns(); track col.title) {
       <div>
         <h4 class="m-0 mb-3 font-mono text-xs uppercase tracking-[0.14em] text-brand-yellow">{{ col.title }}</h4>
         @for (item of col.items; track item) {

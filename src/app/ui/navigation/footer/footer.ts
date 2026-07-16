@@ -1,16 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
 import { Wordmark } from '../../brand/wordmark/wordmark';
-
-interface FooterColumn {
-  title: string;
-  items: string[];
-}
-
-const COLUMNS: FooterColumn[] = [
-  { title: 'Servicios', items: ['Aplicaciones web', 'Páginas & landings', 'Automatizaciones', 'Integraciones / API'] },
-  { title: 'Empresa', items: ['Nosotros', 'Proyectos', 'Blog', 'Contacto'] },
-  { title: 'Recursos', items: ['Soporte', 'Estado', 'Términos', 'Privacidad'] },
-];
+import { CmsContentService } from '../../../core/cms-content.service';
 
 /** Dark marketing footer with columns and fine print. */
 @Component({
@@ -19,5 +9,13 @@ const COLUMNS: FooterColumn[] = [
   templateUrl: './footer.html',
 })
 export class Footer {
-  readonly columns = COLUMNS;
+  private readonly cms = inject(CmsContentService);
+
+  readonly footer = this.cms.footer;
+  readonly columns = computed(() =>
+    this.footer().columns.map((column) => ({
+      title: column.title,
+      items: column.links.split('\n').map((item) => item.trim()).filter(Boolean),
+    })),
+  );
 }

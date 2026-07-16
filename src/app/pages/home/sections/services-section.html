@@ -1,13 +1,26 @@
 <section id="servicios" class="bg-surface-page px-8 py-24">
   <div class="mx-auto max-w-[1200px]">
-    <div class="mb-3.5 font-mono text-[13px] uppercase tracking-[0.14em] text-brand-orange-600">// Qué hacemos</div>
-    <h2 class="m-0 mb-12 max-w-[640px] font-display text-4xl font-bold leading-[1.15] tracking-[-0.03em] text-text-strong">
-      Un socio tecnológico, no solo un proveedor
-    </h2>
+    <div class="mb-12 flex flex-wrap items-end justify-between gap-6">
+      <div>
+        <div class="mb-3.5 font-mono text-[13px] uppercase tracking-[0.14em] text-brand-orange-600">// {{ content().eyebrow }}</div>
+        <h2 class="m-0 max-w-[640px] font-display text-4xl font-bold leading-[1.15] tracking-[-0.03em] text-text-strong">
+          {{ content().title }}@if (content().highlight) { <span class="text-brand-orange"> {{ content().highlight }}</span> }
+        </h2>
+        @if (content().description) {
+          <p class="mt-4 max-w-[580px] text-lg text-text-muted">{{ content().description }}</p>
+        }
+      </div>
+      @if (content().image) {
+        <img [src]="content().image" alt="" class="h-[140px] w-[250px] rounded-lg border border-border-subtle object-cover shadow-sm" />
+      }
+    </div>
     <div class="grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] gap-6">
-      @for (service of services; track service.title) {
+      @for (service of services(); track service.title) {
         <app-card elevation="sm" [interactive]="true" [accent]="true">
-          <div class="mb-4 text-2xl text-brand-orange">{{ service.icon }}</div>
+          @if (service.image) {
+            <img [src]="service.image" [alt]="service.title" class="mb-5 aspect-[16/9] w-full rounded-md object-cover" />
+          }
+          <div class="mb-4 text-2xl" [style.color]="service.color">{{ service.glyph }}</div>
           <h3 class="m-0 mb-2 font-display text-xl font-semibold text-text-strong">{{ service.title }}</h3>
           <p class="m-0 text-[15px] leading-[1.6] text-text-muted">{{ service.body }}</p>
         </app-card>

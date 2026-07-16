@@ -1,4 +1,8 @@
 <section class="relative overflow-hidden bg-[image:var(--gradient-ink)] px-8 pt-[104px] pb-[118px] text-text-on-inverse">
+  @if (content().image) {
+    <img [src]="content().image" alt="" class="pointer-events-none absolute inset-y-0 right-0 h-full w-full object-cover opacity-55 md:w-[58%]" />
+    <div class="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,var(--ink-950)_0%,rgba(11,15,26,0.92)_42%,rgba(11,15,26,0.28)_100%)]"></div>
+  }
   <div
     class="pointer-events-none absolute inset-0 bg-[image:var(--texture-grid)] bg-[length:var(--texture-grid-size)] opacity-50 [mask-image:radial-gradient(circle_at_70%_30%,#000_0%,transparent_75%)]"
   ></div>
@@ -15,17 +19,18 @@
         class="mb-[22px] inline-flex items-center gap-2 rounded-pill border border-[var(--glass-border)] bg-[var(--glass-dark)] px-3.5 py-[7px] font-mono text-[13px] uppercase tracking-[0.14em] text-brand-cyan backdrop-blur-sm"
       >
         <span class="h-[7px] w-[7px] rounded-full bg-brand-cyan shadow-[0_0_10px_var(--brand-cyan)]"></span>
-        Soluciones informáticas a medida
+        {{ content().eyebrow }}
       </div>
 
       <h1 class="m-0 font-display text-[74px] font-bold leading-[1.05] tracking-[-0.03em]">
-        Software que hace<br />
-        <span class="bg-[image:var(--text-gradient)] bg-clip-text text-transparent">crecer tu empresa</span>
+        {{ content().title }}<br />
+        @if (content().highlight) {
+          <span class="bg-[image:var(--text-gradient)] bg-clip-text text-transparent">{{ content().highlight }}</span>
+        }
       </h1>
 
       <p class="mt-[26px] max-w-[560px] text-xl leading-snug text-text-inverse-muted">
-        Diseñamos y construimos aplicaciones web, páginas y automatizaciones. Del prototipo a producción, con
-        comunicación cercana en cada paso.
+        {{ content().description }}
       </p>
 
       <div class="mt-9 flex flex-wrap gap-3.5">
@@ -39,7 +44,7 @@
 
       <div class="mt-11 flex flex-wrap items-center gap-2.5">
         <span class="font-mono text-xs uppercase tracking-[0.14em] text-text-faint">stack</span>
-        @for (tech of stack; track tech) {
+        @for (tech of stack(); track tech) {
           <span
             class="rounded-pill border border-[var(--glass-border)] bg-[var(--glass-dark)] px-3 py-1.5 font-mono text-[13px] text-brand-cyan-300 backdrop-blur-sm"
             >{{ tech }}</span

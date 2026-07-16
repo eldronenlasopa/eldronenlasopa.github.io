@@ -1,38 +1,32 @@
 <header [class]="headerClasses()">
-  <div class="flex items-center justify-between px-5 py-4 md:px-8">
+  <div class="flex items-center justify-between px-5 py-4 min-[821px]:px-8">
     <app-wordmark [tone]="inverse() ? 'light' : 'dark'" />
-    <nav class="hidden items-center gap-7 md:flex">
+    <nav class="hidden items-center gap-7 min-[821px]:flex">
       @for (link of links(); track link.label) {
         <a [href]="link.href" [class]="linkClasses()">{{ link.label }}</a>
       }
     </nav>
-    <div class="hidden md:block">
+    <div class="hidden min-[821px]:block">
       <app-button variant="primary" size="sm" (clicked)="ctaClicked.emit()">{{ cta() }}</app-button>
     </div>
-    <app-icon-button
-      class="md:hidden"
-      [label]="menuOpen() ? 'Cerrar menú' : 'Abrir menú'"
-      variant="ghost"
-      size="sm"
-      (clicked)="toggleMenu()"
+    <button
+      type="button"
+      class="inline-flex h-11 w-11 flex-col items-center justify-center gap-[5px] border-0 bg-transparent p-0 min-[821px]:hidden"
+      [attr.aria-label]="menuOpen() ? 'Cerrar menú' : 'Abrir menú'"
+      [attr.aria-expanded]="menuOpen()"
+      (click)="toggleMenu()"
     >
-      @if (menuOpen()) {
-        <svg [class]="iconClasses()" width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-          <path d="M5 5l10 10M15 5L5 15" />
-        </svg>
-      } @else {
-        <svg [class]="iconClasses()" width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-          <path d="M3 5h14M3 10h14M3 15h14" />
-        </svg>
-      }
-    </app-icon-button>
+      <span [class]="barClasses()[0]"></span>
+      <span [class]="barClasses()[1]"></span>
+      <span [class]="barClasses()[2]"></span>
+    </button>
   </div>
   @if (menuOpen()) {
     <nav [class]="mobileNavClasses()">
       @for (link of links(); track link.label) {
         <a [href]="link.href" [class]="mobileLinkClasses()" (click)="closeMenu()">{{ link.label }}</a>
       }
-      <div class="pt-2">
+      <div class="mt-2">
         <app-button variant="primary" size="sm" [fullWidth]="true" (clicked)="onMobileCta()">{{ cta() }}</app-button>
       </div>
     </nav>

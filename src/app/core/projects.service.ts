@@ -1,26 +1,63 @@
 import { Injectable, inject } from '@angular/core';
-import { map, Observable } from 'rxjs';
-import { ApiService } from './api.service';
-import type { ApiProject } from './models/api.models';
+import { Observable, of } from 'rxjs';
+import { CmsContentService, type CmsProjectItem } from './cms-content.service';
 import { Project } from './projects-data';
 
-function toProject(project: ApiProject): Project {
+function slugify(value: string): string {
+  return value
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '');
+}
+
+function projectGlyph(category: string): string {
+  if (category === 'Landing') return '▲';
+  if (category === 'Automatización') return '⬡';
+  if (category === 'Integración') return '⬢';
+  return '◆';
+}
+
+function toProject(project: CmsProjectItem): Project {
   return {
-    slug: project.slug, title: project.title, client: project.clientName, cat: project.category, year: String(project.year),
-    color: project.category === 'Landing' ? '#F7C948' : project.category === 'Web' ? '#FF6B35' : '#22D3EE',
-    tags: project.tags ?? [], metric: `${project.progress}% avance`, glyph: project.category === 'Landing' ? '▲' : '◈', duration: 'A medida',
-    desc: project.description, summary: project.description, challenge: 'Estamos entendiendo el reto operativo de este proyecto.',
-    solution: 'Construimos una solución digital a medida y medimos su avance con el equipo.',
-    results: [[`${project.progress}%`, 'avance'], [project.status, 'estado'], [String(project.year), 'año']],
+    slug: slugify(`${project.client}-${project.title}`),
+    title: project.title,
+    client: project.client,
+    cat: project.cat,
+    year: project.year,
+    color: project.color,
+    tags: [project.cat, project.client].filter(Boolean),
+    metric: project.metric,
+    glyph: projectGlyph(project.cat),
+    logo: project.logo,
+    duration: 'A medida',
+    desc: project.summary,
+    summary: project.summary,
+    challenge: project.challenge,
+    solution: project.solution,
+    results: [
+      [project.metric || 'A medida', 'resultado'],
+      [project.cat, 'tipo'],
+      [project.year, 'año'],
+    ],
   };
 }
 
 @Injectable({ providedIn: 'root' })
 export class ProjectsService {
-  private readonly api = inject(ApiService);
-  list(): Observable<Project[]> { return this.api.projects().pipe(map(items => items.map(toProject))); }
-  clientList(): Observable<Project[]> { return this.api.clientProjects().pipe(map(items => items.map(toProject))); }
+  private readonly cms = inject(CmsContentService);
+
+  list(): Observable<Project[]> {
+    return of(this.cms.projects().map(toProject));
+  }
+
+  clientList(): Observable<Project[]> {
+    return this.list();
+  }
+
   bySlug(slug: string): Observable<Project> {
-    return this.api.project(slug).pipe(map(toProject));
+    const projects = this.cms.projects().map(toProject);
+    return of(projects.find((project) => project.slug === slug) ?? projects[0]);
   }
 }

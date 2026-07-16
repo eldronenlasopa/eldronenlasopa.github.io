@@ -1,8 +1,7 @@
-import { Component, inject } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { Button } from '../../../ui/actions/button/button';
-
-const STACK = ['React', 'Node.js', 'Python', 'PostgreSQL', 'n8n', 'AWS'];
+import { CmsContentService } from '../../../core/cms-content.service';
 
 @Component({
   selector: 'app-hero-section',
@@ -11,8 +10,10 @@ const STACK = ['React', 'Node.js', 'Python', 'PostgreSQL', 'n8n', 'AWS'];
 })
 export class HeroSection {
   private readonly router = inject(Router);
+  private readonly cms = inject(CmsContentService);
 
-  readonly stack = STACK;
+  readonly content = this.cms.section('hero');
+  readonly stack = computed(() => this.content().items.split('\n').map((item) => item.trim()).filter(Boolean));
 
   goToProposal(): void {
     this.router.navigateByUrl('/solicitar-propuesta');

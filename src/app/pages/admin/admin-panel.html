@@ -23,7 +23,7 @@
 
     <nav class="relative flex flex-col gap-1">
       @for (n of nav; track n.id) {
-        <button type="button" [class]="navClasses(n.id)" (click)="active.set(n.id)">
+        <button type="button" [class]="navClasses(n.id)" (click)="selectNav(n)">
           <span class="text-base">{{ n.icon }}</span>{{ n.label }}
         </button>
       }
@@ -65,8 +65,8 @@
             <app-card elevation="sm" padding="var(--space-5)">
               <div class="font-mono text-[11px] tracking-[var(--ls-label)] text-text-muted uppercase">Proyectos activos</div>
               <div class="mt-2 flex items-baseline gap-2.5">
-                <span class="font-display text-[34px] font-bold tracking-[var(--ls-tight)] text-text-strong">{{ activeProjectsCount }}</span>
-                <app-badge tone="warning">{{ atRiskProjectsCount }} en riesgo</app-badge>
+                <span class="font-display text-[34px] font-bold tracking-[var(--ls-tight)] text-text-strong">{{ activeProjectsCount() }}</span>
+                <app-badge tone="warning">{{ atRiskProjectsCount() }} en riesgo</app-badge>
               </div>
             </app-card>
             <app-card elevation="sm" padding="var(--space-5)">
@@ -213,7 +213,7 @@
                   </tr>
                 </thead>
                 <tbody>
-                  @for (p of projects; track p.slug) {
+                  @for (p of projects(); track p.slug) {
                     <tr class="border-t border-border-subtle text-text-body">
                       <td class="px-6 py-3.5 font-medium text-text-strong">{{ p.name }}</td>
                       <td class="px-6 py-3.5 text-text-muted">{{ p.cliente }}</td>

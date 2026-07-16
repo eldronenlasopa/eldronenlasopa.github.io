@@ -1,4 +1,7 @@
 <div [class]="cardClasses()">
+  @if (image()) {
+    <img [src]="image()" [alt]="name()" class="aspect-[16/9] w-full rounded-md object-cover" />
+  }
   @if (badge() || featured()) {
     <span class="absolute top-5 right-5">
       <app-badge [tone]="featured() ? 'brand' : 'neutral'">{{ badge() || 'Recomendado' }}</app-badge>

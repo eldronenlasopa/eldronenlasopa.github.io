@@ -7,6 +7,7 @@ import { ProjectDetail } from './pages/projects/project-detail/project-detail';
 import { ClientDashboard } from './pages/client/client-dashboard';
 import { NewTicket } from './pages/client/new-ticket/new-ticket';
 import { AdminPanel } from './pages/admin/admin-panel';
+import { AdminContent } from './pages/admin/admin-content/admin-content';
 import { Loader } from './ui/brand/loader/loader';
 import { authGuard } from './core/auth.guard';
 
@@ -38,6 +39,12 @@ export const routes: Routes = [
   {
     path: 'admin',
     component: AdminPanel,
+    canActivate: [authGuard],
+    data: { role: 'admin' },
+  },
+  {
+    path: 'admin/contenido',
+    component: AdminContent,
     canActivate: [authGuard],
     data: { role: 'admin' },
   },

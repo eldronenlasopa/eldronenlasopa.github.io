@@ -91,12 +91,20 @@
               <div
                 class="absolute inset-0 bg-[image:var(--texture-grid)] bg-[length:var(--texture-grid-size)] opacity-50"
               ></div>
-              <span
-                class="relative text-[52px] transition-transform duration-200 ease-out group-hover:scale-110"
-                [style.color]="p.color"
-                [style.text-shadow]="'0 0 26px ' + p.color + '66'"
-                >{{ p.glyph }}</span
-              >
+              @if (p.logo) {
+                <img
+                  [src]="p.logo"
+                  [alt]="p.title"
+                  class="relative max-h-[70px] max-w-[58%] object-contain transition-transform duration-200 ease-out group-hover:scale-105"
+                />
+              } @else {
+                <span
+                  class="relative text-[52px] transition-transform duration-200 ease-out group-hover:scale-110"
+                  [style.color]="p.color"
+                  [style.text-shadow]="'0 0 26px ' + p.color + '66'"
+                  >{{ p.glyph }}</span
+                >
+              }
               <span
                 class="absolute top-3.5 right-3.5 rounded-pill border border-[var(--glass-border)] bg-[var(--glass-dark)] px-2.5 py-1 font-mono text-xs text-brand-cyan-300"
                 >{{ p.year }}</span

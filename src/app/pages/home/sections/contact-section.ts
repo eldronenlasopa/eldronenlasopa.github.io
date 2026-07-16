@@ -1,12 +1,11 @@
-import { Component, inject } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
 import { ContactForm } from '../../../ui/forms/contact-form/contact-form';
 import { ApiService } from '../../../core/api.service';
 import { DialogService } from '../../../core/services/dialog.service';
 import { RecaptchaService } from '../../../core/services/recaptcha.service';
 import { ToastService } from '../../../core/services/toast.service';
 import type { ContactFormValue } from '../../../ui/forms/contact-form/contact-form';
-
-const HIGHLIGHTS = ['Diagnóstico gratuito', 'Presupuesto sin compromiso', 'Equipo local, comunicación en español'];
+import { CmsContentService } from '../../../core/cms-content.service';
 
 @Component({ selector: 'app-contact-section', imports: [ContactForm], templateUrl: './contact-section.html' })
 export class ContactSection {
@@ -14,8 +13,10 @@ export class ContactSection {
   private readonly dialog = inject(DialogService);
   private readonly recaptcha = inject(RecaptchaService);
   private readonly toast = inject(ToastService);
+  private readonly cms = inject(CmsContentService);
   private submitting = false;
-  readonly highlights = HIGHLIGHTS;
+  readonly content = this.cms.section('contact');
+  readonly highlights = computed(() => this.content().items.split('\n').map((item) => item.trim()).filter(Boolean));
 
   async submit(value: ContactFormValue): Promise<void> {
     if (this.submitting) return;

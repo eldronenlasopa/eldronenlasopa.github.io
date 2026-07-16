@@ -1,5 +1,5 @@
-import { Component, computed, inject, signal, OnInit } from '@angular/core';
-import { ApiService } from '../../../core/api.service';
+import { Component, computed, inject, signal } from '@angular/core';
+import { CmsContentService } from '../../../core/cms-content.service';
 
 interface Review {
   quote: string;
@@ -7,52 +7,21 @@ interface Review {
   role: string;
   company: string;
   initials: string;
+  photo: string;
   rating: number;
   color: string;
 }
 
-const REVIEWS: Review[] = [
-  {
-    quote:
-      'El panel de inventario nos cambió la operación por completo. Redujimos el tiempo de conteo casi a la mitad y ahora tomamos decisiones con datos en tiempo real, no con corazonadas.',
-    name: 'María Fernández',
-    role: 'Gerente de operaciones',
-    company: 'Comercial Andina',
-    initials: 'MF',
-    rating: 5,
-    color: '#FF6B35',
-  },
-  {
-    quote:
-      'Automatizaron toda nuestra facturación conectándola con la SUNAT. Recuperamos 8 horas a la semana que antes eran puro trabajo manual y errores.',
-    name: 'Diego Vega',
-    role: 'Fundador',
-    company: 'Estudio Vega',
-    initials: 'DV',
-    rating: 5,
-    color: '#22D3EE',
-  },
-  {
-    quote:
-      'La landing de campaña triplicó nuestras conversiones. Comunicación clara, entregas a tiempo y un equipo que de verdad entiende de negocio.',
-    name: 'Ana Rojas',
-    role: 'Marketing lead',
-    company: 'Nova Fitness',
-    initials: 'AR',
-    rating: 5,
-    color: '#F7C948',
-  },
-  {
-    quote:
-      'Integraron tres pasarelas de pago en un checkout único y estable. Cero caídas en campaña alta. Son el equipo técnico que quisiéramos tener de planta.',
-    name: 'Luis Paredes',
-    role: 'CTO',
-    company: 'MercadoSur',
-    initials: 'LP',
-    rating: 5,
-    color: '#7DE8F7',
-  },
-];
+const EMPTY_REVIEW: Review = {
+  quote: 'Aún no hay reseñas publicadas.',
+  name: 'DronLab',
+  role: 'Equipo',
+  company: 'El Dron en la Sopa',
+  initials: 'DL',
+  photo: '',
+  rating: 5,
+  color: '#22D3EE',
+};
 
 const STARS = [0, 1, 2, 3, 4];
 
@@ -60,14 +29,29 @@ const STARS = [0, 1, 2, 3, 4];
   selector: 'app-reviews-section',
   templateUrl: './reviews-section.html',
 })
-export class ReviewsSection implements OnInit {
-  private readonly api = inject(ApiService);
-  readonly reviews = signal<Review[]>([]);
+export class ReviewsSection {
+  private readonly cms = inject(CmsContentService);
+  readonly reviews = computed<Review[]>(() =>
+    this.cms.reviews().map((item) => ({
+      quote: item.quote,
+      name: item.name,
+      role: item.role,
+      company: item.company,
+      initials: this.initials(item.name),
+      photo: item.photo,
+      rating: Number(item.rating) || 5,
+      color: item.color || '#22D3EE',
+    })),
+  );
   readonly stars = STARS;
+  readonly content = this.cms.section('reviews');
+  readonly summary = computed(() => {
+    const [score, caption] = this.content().items.split('|').map((part) => part.trim());
+    return { score: score || '4.9', caption: caption || 'basado en proyectos publicados' };
+  });
 
   readonly active = signal(0);
-  readonly activeReview = computed(() => this.reviews()[this.active()] ?? REVIEWS[0]);
-  ngOnInit(): void { this.api.reviews().subscribe(items => this.reviews.set(items.map(item => ({ quote: item.body, name: item.authorName, role: 'Cliente', company: item.companyName ?? '', initials: item.authorName.split(' ').map(part => part[0]).join('').slice(0, 2).toUpperCase(), rating: item.rating, color: '#22D3EE' })))); }
+  readonly activeReview = computed(() => this.reviews()[this.active()] ?? this.reviews()[0] ?? EMPTY_REVIEW);
 
   select(index: number): void {
     this.active.set(index);
@@ -87,5 +71,9 @@ export class ReviewsSection implements OnInit {
       'm-0.5 inline-flex h-12 w-12 items-center justify-center rounded-full font-display text-base font-bold',
       on ? 'bg-[image:var(--gradient-hud)] text-ink-950 opacity-100' : 'bg-surface-sunken text-text-muted opacity-75',
     ].join(' ');
+  }
+
+  private initials(name: string): string {
+    return name.split(' ').map((part) => part[0]).join('').slice(0, 2).toUpperCase() || '?';
   }
 }

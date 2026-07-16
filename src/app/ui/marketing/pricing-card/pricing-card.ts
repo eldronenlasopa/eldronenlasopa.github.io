@@ -15,6 +15,7 @@ export class PricingCard {
   readonly description = input<string>();
   readonly features = input<string[]>([]);
   readonly cta = input('Empezar');
+  readonly image = input('');
   readonly featured = input(false);
   readonly badge = input<string>();
   readonly ctaClicked = output<void>();

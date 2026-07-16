@@ -7,12 +7,13 @@ import { IconButton } from '../../ui/actions/icon-button/icon-button';
 import { Wordmark } from '../../ui/brand/wordmark/wordmark';
 import { AuthService } from '../../core/auth.service';
 import { TicketsService } from '../../core/tickets.service';
-import { PROJECTS } from '../../core/projects-data';
+import { CmsContentService } from '../../core/cms-content.service';
 
 interface NavItem {
   id: string;
   label: string;
   icon: string;
+  route?: string;
 }
 
 interface AdminClient {
@@ -38,6 +39,7 @@ const NAV: NavItem[] = [
   { id: 'clientes', label: 'Clientes', icon: '◑' },
   { id: 'proyectos', label: 'Proyectos', icon: '▤' },
   { id: 'tickets', label: 'Tickets', icon: '◇' },
+  { id: 'contenido', label: 'Contenido web', icon: '❏', route: '/admin/contenido' },
 ];
 
 const CLIENTS: AdminClient[] = [
@@ -62,13 +64,6 @@ const PROJECT_MOCK: Record<string, { lead: string; progress: number; estado: [st
   'landing-saas': { lead: 'Luis P.', progress: 100, estado: ['Entregado', 'success'] },
 };
 
-const ADMIN_PROJECTS: AdminProjectRow[] = PROJECTS.map((p) => ({
-  slug: p.slug,
-  name: p.title,
-  cliente: p.client,
-  ...PROJECT_MOCK[p.slug],
-}));
-
 /** All seed/mock tickets belong to the single mocked client session (`cliente@dronlab.pe` → Comercial Andina). */
 const TICKET_CLIENT_FALLBACK = 'Comercial Andina';
 
@@ -88,11 +83,19 @@ export class AdminPanel {
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
   private readonly ticketsService = inject(TicketsService);
+  private readonly cms = inject(CmsContentService);
 
   readonly nav = NAV;
   readonly clients = CLIENTS;
   readonly topClients = CLIENTS.slice(0, 4);
-  readonly projects = ADMIN_PROJECTS;
+  readonly projects = computed<AdminProjectRow[]>(() =>
+    this.cms.projects().map((p) => ({
+      slug: `${p.client}-${p.title}`.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''),
+      name: p.title,
+      cliente: p.client,
+      ...(PROJECT_MOCK[p.title] ?? { lead: 'Equipo DronLab', progress: 65, estado: ['En contenido', 'info'] as [string, BadgeTone] }),
+    })),
+  );
   readonly tickets = this.ticketsService.tickets;
 
   readonly user = this.auth.currentUser;
@@ -101,13 +104,21 @@ export class AdminPanel {
   readonly activeLabel = computed(() => this.nav.find((n) => n.id === this.active())?.label ?? '');
 
   readonly activeClientsCount = this.clients.filter((c) => c.estado[0] === 'Activo').length;
-  readonly activeProjectsCount = this.projects.filter((p) => p.estado[0] !== 'Entregado').length;
-  readonly atRiskProjectsCount = this.projects.filter((p) => p.estado[0] !== 'Entregado' && p.progress < 50).length;
+  readonly activeProjectsCount = computed(() => this.projects().filter((p) => p.estado[0] !== 'Entregado').length);
+  readonly atRiskProjectsCount = computed(() => this.projects().filter((p) => p.estado[0] !== 'Entregado' && p.progress < 50).length);
   readonly monthlyRevenue = `S/ ${this.clients.reduce((sum, c) => sum + parseFloat(c.ingresos.replace(/[^0-9.]/g, '')), 0).toFixed(1)}k`;
 
   readonly openTicketsCount = computed(() => this.tickets().filter((t) => t.estado === 'Abierto').length);
   readonly highPrioTicketsCount = computed(() => this.tickets().filter((t) => t.prio[0] === 'Alta').length);
   readonly urgentTickets = computed(() => this.tickets().filter((t) => t.prio[0] === 'Alta'));
+
+  selectNav(n: NavItem): void {
+    if (n.route) {
+      this.router.navigateByUrl(n.route);
+      return;
+    }
+    this.active.set(n.id);
+  }
 
   navClasses(id: string): string {
     const on = id === this.active();
@@ -122,7 +133,7 @@ export class AdminPanel {
   }
 
   clientProjectCount(name: string): number {
-    return this.projects.filter((p) => p.cliente === name).length;
+    return this.projects().filter((p) => p.cliente === name).length;
   }
 
   clientTicketCount(name: string): number {

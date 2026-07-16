@@ -5,13 +5,16 @@
 
   <div class="relative mx-auto grid max-w-[1200px] items-center gap-16 md:grid-cols-2">
     <div>
-      <div class="mb-3.5 font-mono text-[13px] uppercase tracking-[0.14em] text-brand-orange-600">// Reseñas</div>
+      <div class="mb-3.5 font-mono text-[13px] uppercase tracking-[0.14em] text-brand-orange-600">// {{ content().eyebrow }}</div>
       <h2 class="m-0 mb-6 font-display text-4xl font-bold leading-[1.15] tracking-[-0.03em] text-text-strong">
-        Clientes que recomiendan nuestro trabajo
+        {{ content().title }}@if (content().highlight) { <span class="text-brand-orange"> {{ content().highlight }}</span> }
       </h2>
+      @if (content().description) {
+        <p class="mb-6 text-base leading-relaxed text-text-muted">{{ content().description }}</p>
+      }
 
       <div class="mb-7 inline-flex items-center gap-4 rounded-lg border border-border-subtle bg-surface-card px-5 py-3.5 shadow-sm">
-        <span class="font-display text-[40px] leading-none font-bold text-text-strong">4.9</span>
+        <span class="font-display text-[40px] leading-none font-bold text-text-strong">{{ summary().score }}</span>
         <span class="h-10 w-px bg-border-subtle"></span>
         <span>
           <span class="inline-flex gap-0.5 text-[17px] text-brand-yellow" aria-label="5 de 5">
@@ -19,9 +22,13 @@
               <span>★</span>
             }
           </span>
-          <div class="mt-1 text-[13px] text-text-muted">basado en 40+ proyectos</div>
+          <div class="mt-1 text-[13px] text-text-muted">{{ summary().caption }}</div>
         </span>
       </div>
+
+      @if (content().image) {
+        <img [src]="content().image" [alt]="content().title" class="mb-7 h-[190px] w-full max-w-[420px] rounded-lg border border-border-subtle object-cover shadow-sm" />
+      }
 
       <div class="flex flex-wrap gap-3">
         @for (review of reviews(); track review.name; let i = $index) {
@@ -32,7 +39,13 @@
             [style.borderColor]="active() === i ? review.color : 'transparent'"
             (click)="select(i)"
           >
-            <span [class]="avatarClasses(i)">{{ review.initials }}</span>
+            @if (review.photo) {
+              <span class="m-0.5 inline-flex h-12 w-12 overflow-hidden rounded-full bg-ink-950">
+                <img [src]="review.photo" [alt]="review.name" class="h-full w-full object-cover" />
+              </span>
+            } @else {
+              <span [class]="avatarClasses(i)">{{ review.initials }}</span>
+            }
           </button>
         }
       </div>
@@ -60,10 +73,16 @@
           {{ activeReview().quote }}
         </p>
         <div class="flex items-center gap-3.5">
-          <span
-            class="flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-full bg-[image:var(--gradient-hud)] font-display text-[17px] font-bold text-ink-950"
-            >{{ activeReview().initials }}</span
-          >
+          @if (activeReview().photo) {
+            <span class="flex h-[52px] w-[52px] shrink-0 overflow-hidden rounded-full bg-ink-950">
+              <img [src]="activeReview().photo" [alt]="activeReview().name" class="h-full w-full object-cover" />
+            </span>
+          } @else {
+            <span
+              class="flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-full bg-[image:var(--gradient-hud)] font-display text-[17px] font-bold text-ink-950"
+              >{{ activeReview().initials }}</span
+            >
+          }
           <div>
             <div class="text-base font-semibold text-text-on-inverse">{{ activeReview().name }}</div>
             <div class="text-sm text-text-inverse-muted">{{ activeReview().role }} · {{ activeReview().company }}</div>
