@@ -12,10 +12,10 @@
 
     <div class="relative max-w-[380px]">
       <h1 class="m-0 font-display text-[clamp(28px,4vw,40px)] font-bold leading-[var(--lh-heading)] tracking-[var(--ls-tight)]">
-        Tu proyecto, siempre a la vista
+        Tu trabajo, siempre a la vista
       </h1>
       <p class="mt-4 text-base leading-[var(--lh-body)] text-text-inverse-muted">
-        Accede para ver avances, tickets, facturas y archivos en un solo lugar.
+        Accede para gestionar proyectos, avances, tickets, facturas y archivos en un solo lugar.
       </p>
     </div>
 
@@ -27,18 +27,13 @@
     <form (ngSubmit)="onSubmit()" class="w-full max-w-[400px]">
       <div class="mb-3 font-mono text-[13px] tracking-[var(--ls-label)] text-brand-orange-600 uppercase">// Acceso</div>
       <h2 class="m-0 mb-2 font-display text-[28px] font-bold text-text-strong">Inicia sesión</h2>
-      <p class="m-0 mb-7 text-[15px] text-text-muted">Selecciona tu tipo de cuenta y entra.</p>
-
-      <div class="mb-6 flex gap-1.5 rounded-pill bg-surface-sunken p-[5px]">
-        <button type="button" [class]="roleButtonClasses('client')" (click)="role.set('client')">Cliente</button>
-        <button type="button" [class]="roleButtonClasses('admin')" (click)="role.set('admin')">Administrador</button>
-      </div>
+      <p class="m-0 mb-7 text-[15px] text-text-muted">Ingresa con las credenciales de tu cuenta.</p>
 
       <div class="mb-[18px]">
         <app-input
           label="Email"
           type="email"
-          [placeholder]="emailPlaceholder()"
+          placeholder="tu@empresa.com"
           [required]="true"
           [value]="email()"
           (valueChange)="email.set($event)"
@@ -59,7 +54,7 @@
       </div>
 
       <app-button type="submit" variant="primary" size="lg" [fullWidth]="true" [disabled]="submitting()">
-        {{ submitLabel() }}
+        {{ submitting() ? 'Ingresando...' : 'Iniciar sesión' }}
         <span slot="icon-right">→</span>
       </app-button>
 
