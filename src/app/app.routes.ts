@@ -12,6 +12,10 @@ import { AdminPanel } from './pages/admin/admin-panel';
 import { AdminContent } from './pages/admin/admin-content/admin-content';
 import { AdminUsers } from './pages/admin/admin-users/admin-users';
 import { Loader } from './ui/brand/loader/loader';
+import { NotFound } from './pages/errors/not-found';
+import { ServerError } from './pages/errors/server-error';
+import { Forbidden } from './pages/errors/forbidden';
+import { Maintenance } from './pages/errors/maintenance';
 import { authGuard } from './core/auth.guard';
 
 export const routes: Routes = [
@@ -95,5 +99,25 @@ export const routes: Routes = [
     component: AdminUsers,
     canActivate: [authGuard],
     data: { role: 'admin', seo: { title: 'Usuarios y roles | DronLab', description: 'Gestión privada de usuarios y roles de DronLab.', index: false } },
+  },
+  {
+    path: 'error/500',
+    component: ServerError,
+    data: { seo: { title: 'Error de servidor | DronLab', description: 'Ocurrió un error inesperado en DronLab.', index: false } },
+  },
+  {
+    path: 'error/403',
+    component: Forbidden,
+    data: { seo: { title: 'Acceso restringido | DronLab', description: 'No tienes permisos para ver esta sección de DronLab.', index: false } },
+  },
+  {
+    path: 'error/503',
+    component: Maintenance,
+    data: { seo: { title: 'En mantenimiento | DronLab', description: 'DronLab está en mantenimiento programado.', index: false } },
+  },
+  {
+    path: '**',
+    component: NotFound,
+    data: { seo: { title: 'Página no encontrada | DronLab', description: 'La página que buscas no existe en DronLab.', index: false } },
   },
 ];

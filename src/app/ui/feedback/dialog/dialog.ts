@@ -40,7 +40,9 @@ export class Dialog {
   readonly ringGradient = computed(
     () => `conic-gradient(from 0deg, transparent 0 62%, ${this.toneColor()} 80%, #fff 90%, transparent 100%)`,
   );
-  readonly cornerGlow = computed(() => `radial-gradient(circle, ${this.toneColor()}33, transparent 66%)`);
+  readonly cornerGlow = computed(
+    () => `radial-gradient(circle, color-mix(in srgb, ${this.toneColor()} 20%, transparent), transparent 66%)`,
+  );
   readonly panelShadow = computed(
     () => `0 30px 80px -20px rgba(0,0,0,0.7), 0 0 40px -16px ${this.toneColor()}`,
   );

@@ -12,7 +12,7 @@ export const authGuard: CanActivateFn = (route) => {
 
   const requiredRole = route.data['role'] as UserRole | undefined;
   if (requiredRole && auth.currentUser()?.role !== requiredRole) {
-    return router.createUrlTree(['/']);
+    return router.createUrlTree(['/error/403']);
   }
 
   return true;

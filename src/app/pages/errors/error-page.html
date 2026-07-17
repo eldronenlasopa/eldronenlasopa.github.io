@@ -1,0 +1,45 @@
+<div class="relative flex min-h-screen flex-col overflow-hidden bg-[image:var(--gradient-ink)] px-6 py-8 font-body text-text-on-inverse sm:px-12">
+  <div class="pointer-events-none absolute inset-0 bg-[image:var(--texture-grid)] bg-[length:var(--texture-grid-size)] opacity-40 [mask-image:radial-gradient(circle_at_50%_35%,#000,transparent_75%)]"></div>
+  <div
+    class="pointer-events-none absolute left-1/2 top-[38%] h-[540px] w-[540px] -translate-x-1/2 -translate-y-1/2"
+    [style.background]="glow()"
+  ></div>
+
+  <a routerLink="/" class="relative w-fit no-underline">
+    <app-wordmark tone="light" size="sm" />
+  </a>
+
+  <main class="relative flex flex-1 flex-col items-center justify-center py-12 text-center">
+    <div class="font-mono text-xs uppercase tracking-[var(--ls-label)]" [style.color]="accentColor()">
+      ERR · {{ code() }}
+    </div>
+    <div
+      class="font-display text-[clamp(120px,24vw,220px)] font-extrabold leading-none text-transparent"
+      [style.-webkit-text-stroke]="codeStroke()"
+      [style.filter]="codeGlow()"
+    >{{ code() }}</div>
+    <h1 class="m-0 mt-2 font-display text-[clamp(24px,3.5vw,34px)] font-bold tracking-[var(--ls-tight)] text-text-on-inverse">
+      {{ title() }}
+    </h1>
+    @if (description()) {
+      <p class="mx-auto mb-0 mt-3 max-w-[460px] text-[15px] leading-[var(--lh-body)] text-text-inverse-muted">
+        {{ description() }}
+      </p>
+    }
+    @if (log()) {
+      <div class="mt-7 max-w-full overflow-x-auto rounded-md border border-[var(--glass-border)] bg-[var(--glass-dark)] px-4 py-2.5 font-mono text-[12.5px] text-text-inverse-muted backdrop-blur-[var(--blur-glass)]">
+        <span [style.color]="accentColor()">$</span> {{ log() }}
+      </div>
+    }
+    <div class="mt-9 flex flex-wrap items-center justify-center gap-3">
+      <app-button variant="primary" (clicked)="primaryClicked.emit()">{{ primaryLabel() }}</app-button>
+      @if (secondaryLabel()) {
+        <app-button variant="ghost-inverse" (clicked)="secondaryClicked.emit()">{{ secondaryLabel() }}</app-button>
+      }
+    </div>
+  </main>
+
+  <footer class="relative text-center font-mono text-[11px] uppercase tracking-[var(--ls-label)] text-text-inverse-muted opacity-70">
+    © 2026 DronLab
+  </footer>
+</div>

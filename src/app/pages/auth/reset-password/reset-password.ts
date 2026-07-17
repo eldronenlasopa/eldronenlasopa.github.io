@@ -1,4 +1,5 @@
 import { Component, computed, inject, signal } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { Button } from '../../../ui/actions/button/button';
 import { Input } from '../../../ui/forms/input/input';
@@ -36,7 +37,7 @@ function strengthOf(password: string): number {
 /** Destination of the reset-password email link — reads `?token=` from the URL. */
 @Component({
   selector: 'app-reset-password',
-  imports: [Button, Input, Wordmark, RouterLink],
+  imports: [FormsModule, Button, Input, Wordmark, RouterLink],
   templateUrl: './reset-password.html',
 })
 export class ResetPassword {
@@ -68,6 +69,7 @@ export class ResetPassword {
   readonly valid = computed(() => this.strength() >= 2 && this.match());
 
   submit(): void {
+    debugger;
     if (!this.valid() || this.submitting() || !this.hasToken) return;
     this.submitting.set(true);
     this.auth.resetPassword(this.token, this.password()).subscribe({
