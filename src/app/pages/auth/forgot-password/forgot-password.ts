@@ -1,4 +1,5 @@
 import { Component, computed, inject, signal } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { Button } from '../../../ui/actions/button/button';
 import { Input } from '../../../ui/forms/input/input';
@@ -10,7 +11,7 @@ const EMAIL_RE = /.+@.+\..+/;
 
 @Component({
   selector: 'app-forgot-password',
-  imports: [Button, Input, Wordmark, RouterLink],
+  imports: [FormsModule, Button, Input, Wordmark, RouterLink],
   templateUrl: './forgot-password.html',
 })
 export class ForgotPassword {
@@ -25,6 +26,7 @@ export class ForgotPassword {
   readonly valid = computed(() => EMAIL_RE.test(this.email()));
 
   submit(): void {
+    debugger;
     if (!this.valid() || this.submitting()) return;
     this.submitting.set(true);
     this.auth.requestPasswordReset(this.email()).subscribe({
