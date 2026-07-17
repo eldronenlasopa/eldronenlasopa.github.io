@@ -2,7 +2,14 @@
   "permissions": {
     "allow": [
       "Bash(npx ngc *)",
-      "Bash(xargs -I{} sh -c 'echo --{}--; cat -n {}')"
+      "Bash(xargs -I{} sh -c 'echo --{}--; cat -n {}')",
+      "Bash(dotnet build *)"
+    ],
+    "additionalDirectories": [
+      "c:\\Proyectos\\personal\\app-eldronenlasopa-services\\Infrastructure\\EmailTemplates",
+      "c:\\Proyectos\\personal\\app-eldronenlasopa-services\\Infrastructure",
+      "c:\\Proyectos\\personal\\app-eldronenlasopa-services\\Controllers",
+      "c:\\Proyectos\\personal\\app-eldronenlasopa-services"
     ]
   }
 }

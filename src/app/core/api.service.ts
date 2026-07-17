@@ -36,7 +36,7 @@ export class ApiService {
   }
 
   resetPassword(token: string, password: string): Observable<void> {
-    return this.unwrap(this.http.post<ApiResponse<void>>(`${this.baseUrl}/auth/reset-password`, { token, password }));
+    return this.unwrap(this.http.post<ApiResponse<void>>(`${this.baseUrl}/auth/reset-password`, { token, newPassword: password }));
   }
 
   projects(): Observable<ApiProject[]> { return this.unwrap(this.http.get<ApiResponse<ApiProject[]>>(`${this.baseUrl}/projects`)); }

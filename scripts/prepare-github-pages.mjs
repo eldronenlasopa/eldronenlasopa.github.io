@@ -51,6 +51,7 @@ const publicRoutes = [
   },
 ];
 const privateRoutes = [
+  ['restablecer-contrasena', 'Restablecer contrasena | DronLab'],
   ['login', 'Acceso de clientes | DronLab'],
   ['olvide-password', 'Recuperar contraseña | DronLab'],
   ['restablecer-password', 'Restablecer contraseña | DronLab'],

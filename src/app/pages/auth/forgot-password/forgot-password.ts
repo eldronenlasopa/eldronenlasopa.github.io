@@ -26,7 +26,6 @@ export class ForgotPassword {
   readonly valid = computed(() => EMAIL_RE.test(this.email()));
 
   submit(): void {
-    debugger;
     if (!this.valid() || this.submitting()) return;
     this.submitting.set(true);
     this.auth.requestPasswordReset(this.email()).subscribe({
