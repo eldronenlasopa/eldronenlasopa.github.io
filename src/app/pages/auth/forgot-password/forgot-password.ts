@@ -31,6 +31,7 @@ export class ForgotPassword {
       next: () => {
         this.submitting.set(false);
         this.sent.set(true);
+        this.toast.success('Solicitud enviada', 'Revisa tu bandeja de entrada y la carpeta de spam.');
       },
       error: () => {
         this.submitting.set(false);

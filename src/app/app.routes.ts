@@ -36,6 +36,11 @@ export const routes: Routes = [
     data: { seo: { title: 'Restablecer contraseña | DronLab', description: 'Crea una nueva contraseña para tu cuenta de DronLab.', index: false } },
   },
   {
+    path: 'restablecer-contrasena',
+    component: ResetPassword,
+    data: { seo: { title: 'Restablecer contraseña | DronLab', description: 'Crea una nueva contraseña para tu cuenta de DronLab.', index: false } },
+  },
+  {
     path: 'loader',
     component: Loader,
     data: { seo: { title: 'Cargando | DronLab', description: 'Pantalla de carga de DronLab.', index: false } },
