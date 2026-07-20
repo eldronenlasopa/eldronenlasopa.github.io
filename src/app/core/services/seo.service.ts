@@ -7,6 +7,7 @@ import { filter } from 'rxjs';
 export const SITE_URL = 'https://eldronenlasopa.github.io';
 const DEFAULT_IMAGE = `${SITE_URL}/og-cover.jpg`;
 
+// Commit de prueba
 export interface SeoConfig {
   title: string;
   description: string;
