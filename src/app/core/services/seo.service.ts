@@ -22,7 +22,9 @@ const ORGANIZATION_SCHEMA = {
   '@id': `${SITE_URL}/#organization`,
   name: 'DronLab',
   alternateName: 'El Dron en la Sopa',
-  url: SITE_URL,
+  legalName: 'El Dron en la Sopa',
+  url: `${SITE_URL}/`,
+  logo: `${SITE_URL}/favicon.svg`,
   email: 'hola@dronlab.pe',
   telephone: '+51 993 908 435',
   areaServed: 'PE',
@@ -126,9 +128,9 @@ export class SeoService {
     const websiteSchema = {
       '@type': 'WebSite',
       '@id': `${SITE_URL}/#website`,
-      url: SITE_URL,
+      url: `${SITE_URL}/`,
       name: 'DronLab',
-      alternateName: 'El Dron en la Sopa',
+      alternateName: ['El Dron en la Sopa', 'Dron Lab'],
       inLanguage: 'es-PE',
       publisher: { '@id': `${SITE_URL}/#organization` },
     };
